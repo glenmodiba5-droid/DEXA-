@@ -1,0 +1,22 @@
+# ── DEXA .gitignore ──────────────────────────────────────────
+ 
+# API keys — NEVER commit this
+config.js
+ 
+# OS clutter
+.DS_Store
+Thumbs.db
+ 
+# Editor folders
+.vscode/
+.idea/
+ 
+# Node (if you ever add a build step)
+node_modules/
+npm-debug.log*
+ 
+# Environment files
+.env
+.env.local
+.env.*
+ 
