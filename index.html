@@ -71,6 +71,47 @@
         /* CARD HOVER */
         .product-card { transition: transform 0.2s, box-shadow 0.2s; }
         .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(9,20,38,0.12); }
+        /* ── MOBILE BOTTOM NAV ── */
+        #mobile-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+            z-index: 60;
+        }
+        @media (min-width: 768px) { #mobile-nav { display: none !important; } }
+ 
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            flex: 1;
+            padding: 4px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #94a3b8;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-tab span {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .nav-tab svg { width: 22px; height: 22px; transition: all 0.2s; }
+        .nav-tab.active { color: #177DFE; }
+        .nav-tab.active svg { transform: scale(1.1); }
+        .nav-tab:active { transform: scale(0.92); }
+ 
  
         /* ── LOADING SPINNER ── */
         .dexa-spinner {
@@ -92,7 +133,7 @@
         /* ── DEXA MUSIC PLAYER ── */
         #dexa-player {
             position: fixed;
-            bottom: 90px;
+            bottom: 80px;
             right: 16px;
             z-index: 200;
             display: flex;
@@ -109,6 +150,9 @@
         }
         @media (min-width: 768px) {
             #dexa-player { bottom: 24px; right: 24px; }
+        }
+        @media (max-width: 767px) {
+            #dexa-player { bottom: 76px; right: 12px; }
         }
         #dexa-player:hover {
             transform: scale(1.05);
@@ -211,7 +255,7 @@
         </header>
  
         <!-- BUYER VIEW -->
-        <div id="buyer-view" class="fade-in p-4 md:p-8">
+        <div id="buyer-view" class="fade-in p-4 md:p-8 pb-24 md:pb-8">
             <div class="relative overflow-hidden rounded-[32px] bg-[#091426] p-8 md:p-12 text-white shadow-2xl mb-8">
                 <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div class="text-center md:text-left">
@@ -247,7 +291,7 @@
         </div>
  
         <!-- SELLER VIEW -->
-        <div id="seller-view" class="hidden fade-in p-4 md:p-8">
+        <div id="seller-view" class="hidden fade-in p-4 md:p-8 pb-24 md:pb-8">
             <div class="max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-3xl font-black text-[#091426]">Seller Hub</h2>
@@ -312,11 +356,47 @@
             </div>
         </div>
  
-        <!-- MOBILE NAV -->
-        <nav class="md:hidden bg-white/90 backdrop-blur-md border-t border-slate-100 fixed bottom-0 w-full flex justify-around py-4 z-50">
-            <button onclick="switchView('buyer')" class="flex flex-col items-center gap-1 text-[#177DFE]"><i data-lucide="shopping-bag" class="w-6 h-6"></i></button>
-            <div class="relative -top-8"><button onclick="switchView('seller'); toggleModal()" class="w-14 h-14 bg-[#091426] rounded-full flex items-center justify-center text-white shadow-xl"><i data-lucide="plus" class="w-6 h-6"></i></button></div>
-            <button onclick="switchView('seller')" class="flex flex-col items-center gap-1 text-slate-400"><i data-lucide="user" class="w-6 h-6"></i></button>
+        <!-- MOBILE BOTTOM NAV — context-aware -->
+        <nav id="mobile-nav">
+            <!-- BUYER NAV (default) -->
+            <div id="buyer-nav-tabs" class="contents">
+                <button class="nav-tab active" id="tab-home" onclick="navTo('home')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Home</span>
+                </button>
+                <button class="nav-tab" id="tab-search" onclick="navTo('search')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span>Search</span>
+                </button>
+                <button class="nav-tab" id="tab-purchases" onclick="navTo('purchases')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span>Purchases</span>
+                </button>
+                <button class="nav-tab" id="tab-profile" onclick="navTo('profile')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Profile</span>
+                </button>
+            </div>
+ 
+            <!-- SELLER NAV (shown when logged in as seller) -->
+            <div id="seller-nav-tabs" class="contents hidden">
+                <button class="nav-tab" id="stab-home" onclick="switchView('buyer'); setActiveTab('stab-home')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Home</span>
+                </button>
+                <button class="nav-tab active" id="stab-upload" onclick="switchView('seller'); setActiveTab('stab-upload')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Upload</span>
+                </button>
+                <button class="nav-tab" id="stab-store" onclick="switchView('seller'); setActiveTab('stab-store')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><rect x="2" y="7" width="20" height="5"/></svg>
+                    <span>My Store</span>
+                </button>
+                <button class="nav-tab" id="stab-profile" onclick="navTo('profile'); setActiveTab('stab-profile')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Profile</span>
+                </button>
+            </div>
         </nav>
     </div>
  
@@ -746,24 +826,74 @@
             filterProducts();
         }
  
+ 
+        // ── MOBILE NAV LOGIC ──────────────────────────────────────────
+        function setActiveTab(id) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            const el = document.getElementById(id);
+            if (el) el.classList.add('active');
+        }
+ 
+        function showBuyerNav() {
+            document.getElementById('buyer-nav-tabs').classList.remove('hidden');
+            document.getElementById('seller-nav-tabs').classList.add('hidden');
+        }
+ 
+        function showSellerNav() {
+            document.getElementById('buyer-nav-tabs').classList.add('hidden');
+            document.getElementById('seller-nav-tabs').classList.remove('hidden');
+        }
+ 
+        function navTo(tab) {
+            // Clear all active
+            document.querySelectorAll('#buyer-nav-tabs .nav-tab').forEach(t => t.classList.remove('active'));
+            if (tab === 'home') {
+                document.getElementById('tab-home').classList.add('active');
+                switchView('buyer');
+            } else if (tab === 'search') {
+                document.getElementById('tab-search').classList.add('active');
+                switchView('buyer');
+                setTimeout(() => document.getElementById('search-input').focus(), 300);
+            } else if (tab === 'purchases') {
+                document.getElementById('tab-purchases').classList.add('active');
+                // Future: show purchases view — for now show buyer marketplace
+                switchView('buyer');
+                showToast('Purchases coming soon!', 'info');
+            } else if (tab === 'profile') {
+                document.getElementById('tab-profile').classList.add('active');
+                // If logged in go to seller dashboard, else open auth modal
+                if (isSupabaseReady) {
+                    supabaseClient.auth.getUser().then(({ data: { user } }) => {
+                        if (user) { switchView('seller'); showSellerNav(); setActiveTab('stab-profile'); }
+                        else toggleModal();
+                    });
+                } else toggleModal();
+            }
+        }
+ 
+        // Override switchView to also update nav state
+        const _origSwitchView = switchView;
+        function switchView(view) {
+            _origSwitchView(view);
+            if (view === 'seller') showSellerNav();
+        }
+ 
         // Init handled by initSupabase() above — no duplicate onload needed
     </script>
  
     <!-- ── DEXA SIGNATURE MUSIC PLAYER ── -->
-    <div id="dexa-player" onclick="toggleMusic()" title="DEXA Vibes">
-        <div class="dexa-disc" id="dexa-disc"></div>
-        <div class="dexa-bars" id="dexa-bars">
-            <span></span><span></span><span></span><span></span><span></span>
+    <div id="dexa-player" onclick="toggleMusic()" title="Tap to mute/unmute">
+        <div class="dexa-disc" id="dexa-disc">
+            <div class="mute-x">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                    <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                    <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </div>
         </div>
-        <div class="dexa-track-info">
-            <span class="dexa-track-name">DEXA Vibes</span>
-            <span class="dexa-track-label" id="dexa-status">Playing</span>
-        </div>
-        <svg class="dexa-mute-icon" id="dexa-mute-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>
     </div>
  
     <!-- Audio element — point src to your MP3 -->
@@ -772,36 +902,17 @@
     </audio>
  
     <script>
-        const audio = document.getElementById('dexa-audio');
-        const disc = document.getElementById('dexa-disc');
-        const bars = document.getElementById('dexa-bars');
-        const status = document.getElementById('dexa-status');
+        const audio  = document.getElementById('dexa-audio');
         const player = document.getElementById('dexa-player');
-        const muteIcon = document.getElementById('dexa-mute-icon');
  
-        // Volume — soft background level
         audio.volume = 0.18;
- 
-        // Remember user preference
         let userMuted = localStorage.getItem('dexa_muted') === 'true';
- 
-        // Mute icon paths
-        const iconPlaying = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
-        const iconMuted  = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>`;
  
         function setPlayerState(playing) {
             if (playing) {
-                disc.classList.remove('paused');
-                bars.classList.remove('paused');
-                status.textContent = 'Playing';
                 player.classList.remove('muted');
-                muteIcon.innerHTML = iconPlaying;
             } else {
-                disc.classList.add('paused');
-                bars.classList.add('paused');
-                status.textContent = 'Muted';
                 player.classList.add('muted');
-                muteIcon.innerHTML = iconMuted;
             }
         }
  
@@ -829,7 +940,7 @@
             }).catch(() => {
                 // Browser blocked autoplay — wait for first interaction then play
                 setPlayerState(false);
-                status.textContent = 'Tap to play';
+                player.title = 'Tap to play';
                 const playOnInteract = () => {
                     if (!userMuted) {
                         audio.play().then(() => setPlayerState(true)).catch(() => {});
