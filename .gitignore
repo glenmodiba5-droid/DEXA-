@@ -1,7 +1,6 @@
 # ── DEXA .gitignore ──────────────────────────────────────────
  
-# API keys — NEVER commit this
-config.js
+
  
 # OS clutter
 .DS_Store
