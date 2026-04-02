@@ -388,7 +388,7 @@
                     <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <span>Upload</span>
                 </button>
-                <button class="nav-tab" id="stab-store" onclick="switchView('seller'); setActiveTab('stab-store')">
+                <button class="nav-tab" id="stab-store" onclick="switchView('seller'); setActiveTab('stab-store'); setTimeout(()=>{ const el=document.getElementById('seller-list'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 300);">
                     <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><rect x="2" y="7" width="20" height="5"/></svg>
                     <span>My Store</span>
                 </button>
@@ -632,14 +632,18 @@
                 buyer.classList.remove('hidden');
                 seller.classList.add('hidden');
                 document.getElementById('mode-text').innerText = 'Buyer';
+                showBuyerNav();
+                setActiveTab('tab-home');
                 loadPublicMarket();
             } else {
-                if (!isSupabaseReady) return alert("System needs keys!");
+                if (!isSupabaseReady) { showToast('System not ready', 'error'); return; }
                 supabaseClient.auth.getUser().then(({ data: { user } }) => {
                     if (user) {
                         buyer.classList.add('hidden');
                         seller.classList.remove('hidden');
                         document.getElementById('mode-text').innerText = 'Seller';
+                        showSellerNav();
+                        setActiveTab('stab-upload');
                         checkUser();
                     } else {
                         toggleModal();
@@ -705,8 +709,10 @@
             const container = document.getElementById('auth-buttons-desktop');
             if (user) {
                 container.innerHTML = `<button onclick="switchView('seller')" class="text-sm font-bold text-emerald-600">Dashboard</button><button onclick="handleLogout()" class="text-sm font-bold text-slate-400 hover:text-red-500">Logout</button>`;
+                showSellerNav();
             } else {
                 container.innerHTML = `<button onclick="toggleModal()" class="text-sm font-bold text-slate-600">Login</button><button onclick="toggleModal(); toggleAuthMode()" class="bg-[#091426] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">Start Selling</button>`;
+                showBuyerNav();
             }
         }
  
@@ -729,7 +735,7 @@
             else if (data.session) {
                 showToast('Shop created! Welcome, ' + shopName + ' 🎉', 'success');
                 toggleModal();
-                checkUser();
+                await checkUser();
                 switchView('seller');
             } else {
                 showToast('Check your email for a confirmation link!', 'info');
@@ -743,10 +749,12 @@
             if (!email || !password) { showToast('Please fill in all fields', 'error'); return; }
  
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) showToast(error.message, 'error');
-            else { 
-                showToast('Welcome back!', 'success');
-                toggleModal(); checkUser(); switchView('seller'); 
+            if (error) { showToast(error.message, 'error'); }
+            else {
+                showToast('Welcome back! 👋', 'success');
+                toggleModal();
+                await checkUser();
+                switchView('seller');
             }
         }
  
@@ -861,22 +869,16 @@
                 showToast('Purchases coming soon!', 'info');
             } else if (tab === 'profile') {
                 document.getElementById('tab-profile').classList.add('active');
-                // If logged in go to seller dashboard, else open auth modal
                 if (isSupabaseReady) {
                     supabaseClient.auth.getUser().then(({ data: { user } }) => {
-                        if (user) { switchView('seller'); showSellerNav(); setActiveTab('stab-profile'); }
-                        else toggleModal();
+                        if (user) { switchView('seller'); }
+                        else { toggleModal(); }
                     });
-                } else toggleModal();
+                } else { toggleModal(); }
             }
         }
  
-        // Override switchView to also update nav state
-        const _origSwitchView = switchView;
-        function switchView(view) {
-            _origSwitchView(view);
-            if (view === 'seller') showSellerNav();
-        }
+        // switchView is already nav-aware — no override needed
  
         // Init handled by initSupabase() above — no duplicate onload needed
     </script>
