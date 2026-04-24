@@ -502,7 +502,7 @@
                     showToast('Payment successful! Generating secure link...', 'success', 6000);
                     
                     const { data, error } = await supabaseClient.storage
-                        .from('product-files')
+                        .from('products')
                         .createSignedUrl(currentProduct.file_url, 60);
                         
                     if (error || !data) {
@@ -784,14 +784,14 @@
                     const coverPath = `${user.id}/${Date.now()}_cover.${coverExt}`;
 
                     const { error: coverErr } = await supabaseClient.storage
-                        .from('product-images')
+                        .from('covers')
                         .upload(coverPath, coverFile);
 
                     if (coverErr) throw coverErr;
 
                     // Get the public URL so we can display it on the store
                     const { data: publicData } = supabaseClient.storage
-                        .from('product-images')
+                        .from('covers')
                         .getPublicUrl(coverPath);
                         
                     finalCoverUrl = publicData.publicUrl;
@@ -803,7 +803,7 @@
                 const prodPath = `${user.id}/${Date.now()}_product.${prodExt}`;
 
                 const { error: fileErr } = await supabaseClient.storage
-                    .from('product-files')
+                    .from('products')
                     .upload(prodPath, prodFile);
 
                 if (fileErr) throw fileErr;
