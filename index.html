@@ -2,20 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEXA - Africa's Digital Marketplace</title>
     
     <link rel="icon" type="image/png" href="assets/dexa_logo_final.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- LUCIDE ICONS - pinned stable version -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
-
+ 
+    <!-- UPLOADCARE -->
+    <script>
+        UPLOADCARE_PUBLIC_KEY = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.UPLOADCARE_KEY : '';
+        UPLOADCARE_TABS = 'file';
+    </script>
+    <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+ 
+    <!-- SUPABASE SDK - pinned stable version via jsDelivr -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
+ 
+    <!-- PAYSTACK SDK -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
-
+ 
+    <!-- DEXA CONFIG (keys live here, gitignored) -->
     <script src="config.js"></script>
-
+ 
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -27,7 +38,7 @@
         }
         .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; visibility: hidden; transition: 0.3s; }
         .modal-visible { opacity: 1; visibility: visible; }
-
+ 
         /* TOAST NOTIFICATIONS */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { display: flex; align-items: center; gap: 12px; background: #0f172a; color: white; padding: 14px 18px; border-radius: 16px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 32px rgba(0,0,0,0.35); min-width: 260px; max-width: 340px; pointer-events: all; border: 1px solid rgba(255,255,255,0.08); animation: toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards; }
@@ -40,7 +51,7 @@
         .toast-close:hover { color: white; }
         @keyframes toastIn { from { opacity: 0; transform: translateX(40px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
         @keyframes toastOut { from { opacity: 1; transform: translateX(0) scale(1); } to { opacity: 0; transform: translateX(40px) scale(0.9); } }
-
+ 
         /* SEARCH & FILTERS */
         .filter-pill { padding: 8px 18px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #64748b; transition: all 0.2s; white-space: nowrap; }
         .filter-pill.active { background: #091426; color: white; border-color: #091426; }
@@ -49,14 +60,87 @@
         .search-wrapper svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 16px; height: 16px; pointer-events: none; }
         #search-input { padding: 12px 16px 12px 40px; border-radius: 999px; border: 1.5px solid #e2e8f0; font-size: 13px; font-weight: 600; background: white; width: 100%; outline: none; font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color 0.2s; }
         #search-input:focus { border-color: #177DFE; }
-
+ 
         /* PRODUCT DETAIL MODAL */
         #product-modal { backdrop-filter: blur(8px); }
         .product-modal-inner { background: white; border-radius: 32px; width: 92%; max-width: 520px; max-height: 88vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0,0,0,0.4); animation: modalSlideUp 0.35s cubic-bezier(0.34,1.2,0.64,1) forwards; }
         @keyframes modalSlideUp { from { opacity: 0; transform: translateY(30px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .product-modal-thumb { width: 100%; height: 200px; background: linear-gradient(135deg, #091426 0%, #1a3a5c 100%); border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
         .product-modal-thumb::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 70% 30%, rgba(23,125,254,0.3), transparent 60%); }
-
+ 
+ 
+        /* ── PRODUCT PAGE ── */
+        #product-page {
+            position: fixed;
+            inset: 0;
+            background: #F8FAFC;
+            z-index: 80;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        #product-page.open { transform: translateX(0); }
+        .product-page-header {
+            position: sticky; top: 0;
+            background: rgba(248,250,252,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #f1f5f9;
+            padding: 14px 16px;
+            display: flex; align-items: center; gap: 12px;
+            z-index: 10;
+        }
+        .back-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: white; border: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+        }
+        .back-btn:hover { background: #f1f5f9; }
+        .image-gallery {
+            display: flex; gap: 0;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            border-radius: 20px;
+            margin: 0 16px;
+        }
+        .image-gallery::-webkit-scrollbar { display: none; }
+        .gallery-img {
+            flex-shrink: 0; width: 100%; height: 260px;
+            object-fit: cover; scroll-snap-align: start;
+        }
+        .gallery-placeholder {
+            flex-shrink: 0; width: 100%; height: 260px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #091426 0%, #1a3a5c 100%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .gallery-placeholder::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(23,125,254,0.3), transparent 60%);
+            border-radius: 20px;
+        }
+        .gallery-dots { display: flex; gap: 6px; justify-content: center; padding: 10px 0; }
+        .gallery-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; transition: all 0.2s; }
+        .gallery-dot.active { background: #177DFE; width: 18px; border-radius: 3px; }
+        .img-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 8px; margin-top: 10px;
+        }
+        .img-preview-item {
+            position: relative; aspect-ratio: 1;
+            border-radius: 10px; overflow: hidden; background: #f1f5f9;
+        }
+        .img-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .img-preview-remove {
+            position: absolute; top: 3px; right: 3px;
+            width: 18px; height: 18px;
+            background: rgba(0,0,0,0.6); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: white; font-size: 10px; font-weight: bold; border: none;
+        }
+ 
         /* CARD HOVER */
         .product-card { transition: transform 0.2s, box-shadow 0.2s; }
         .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(9,20,38,0.12); }
@@ -75,7 +159,7 @@
             z-index: 60;
         }
         @media (min-width: 768px) { #mobile-nav { display: none !important; } }
-
+ 
         .nav-tab {
             display: flex;
             flex-direction: column;
@@ -100,8 +184,8 @@
         .nav-tab.active { color: #177DFE; }
         .nav-tab.active svg { transform: scale(1.1); }
         .nav-tab:active { transform: scale(0.92); }
-
-
+ 
+ 
         /* ── LOADING SPINNER ── */
         .dexa-spinner {
             display: inline-block;
@@ -118,7 +202,7 @@
             padding: 60px 20px; gap: 16px;
         }
         .loading-state p { color: #94a3b8; font-size: 13px; font-weight: 600; }
-
+ 
         /* ── DEXA MUSIC PLAYER ── */
         #dexa-player {
             position: fixed;
@@ -149,7 +233,7 @@
             box-shadow: 0 12px 40px rgba(23,125,254,0.25);
         }
         #dexa-player.muted { border-color: rgba(255,255,255,0.1); opacity: 0.7; }
-
+ 
         /* Vinyl disc */
         .dexa-disc {
             width: 32px;
@@ -173,7 +257,7 @@
         }
         .dexa-disc.paused { animation-play-state: paused; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
+ 
         /* Sound bars */
         .dexa-bars {
             display: flex;
@@ -198,38 +282,41 @@
             from { transform: scaleY(0.4); }
             to   { transform: scaleY(1.2); }
         }
-
+ 
         .dexa-track-info { display: flex; flex-direction: column; line-height: 1.2; }
         .dexa-track-name { font-size: 11px; font-weight: 700; color: white; letter-spacing: 0.02em; }
         .dexa-track-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; text-transform: uppercase; }
-
+ 
         .dexa-mute-icon { color: rgba(255,255,255,0.4); flex-shrink: 0; transition: color 0.2s; }
         #dexa-player:hover .dexa-mute-icon { color: white; }
-
+ 
         /* Intro fade-in */
         #dexa-player { animation: playerSlideIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 1.5s both; }
         @keyframes playerSlideIn {
             from { opacity: 0; transform: translateY(20px) scale(0.8); }
             to   { opacity: 1; transform: translateY(0) scale(1); }
         }
-
+ 
     </style>
 </head>
 <body class="text-slate-900">
-
+ 
     <div class="app-layout">
         
+        <!-- HEADER -->
         <header class="bg-white sticky top-0 z-20 border-b border-slate-100 px-4 md:px-8 py-4 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
                 <img src="assets/dexa_logo_final.png" class="h-8 md:h-10">
                 <span class="text-xl md:text-2xl font-black tracking-tighter">DEXA</span>
             </div>
-
+ 
+            <!-- Desktop Nav -->
             <div class="desktop-nav hidden items-center gap-6">
                 <button onclick="switchView('buyer')" class="text-sm font-bold text-slate-600 hover:text-[#177DFE]">Marketplace</button>
                 <div id="auth-buttons-desktop" class="flex gap-4"></div>
             </div>
-
+ 
+            <!-- Mobile Toggle -->
             <div class="md:hidden" onclick="toggleAppMode()">
                 <div class="bg-slate-100 p-2 rounded-full flex items-center gap-2">
                     <span id="mode-text" class="text-[10px] font-bold uppercase text-slate-500 pl-1">Buyer</span>
@@ -239,7 +326,8 @@
                 </div>
             </div>
         </header>
-
+ 
+        <!-- BUYER VIEW -->
         <div id="buyer-view" class="fade-in p-4 md:p-8 pb-24 md:pb-8">
             <div class="relative overflow-hidden rounded-[32px] bg-[#091426] p-8 md:p-12 text-white shadow-2xl mb-8">
                 <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
@@ -251,7 +339,8 @@
                     </div>
                 </div>
             </div>
-
+ 
+            <!-- SEARCH + FILTERS -->
             <div class="mb-6 flex flex-col gap-4">
                 <div class="search-wrapper">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -267,21 +356,23 @@
                     <button class="filter-pill" data-cat="other" onclick="setCategory(this, 'other')">Other</button>
                 </div>
             </div>
-
+ 
             <h2 class="text-2xl font-black text-[#091426] mb-6">Trending Now</h2>
             <div id="public-product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <p class="text-slate-400 text-sm col-span-full text-center py-10">Loading marketplace...</p>
             </div>
         </div>
-
+ 
+        <!-- SELLER VIEW -->
         <div id="seller-view" class="hidden fade-in p-4 md:p-8 pb-24 md:pb-8">
             <div class="max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-3xl font-black text-[#091426]">Seller Hub</h2>
                     <span id="seller-shop-name" class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full"></span>
                 </div>
-
+ 
                 <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Stats -->
                     <div class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm h-fit">
                         <div class="flex items-center gap-3 mb-6 text-slate-400">
                             <i data-lucide="wallet" class="w-6 h-6"></i>
@@ -290,15 +381,16 @@
                         <h3 class="text-4xl font-black text-[#091426] mb-2">R 0.00</h3>
                         <button class="w-full bg-[#177DFE] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Withdraw Funds</button>
                     </div>
-
+ 
+                    <!-- Upload Form -->
                     <div class="lg:col-span-2 bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
                         <h3 class="font-bold text-lg mb-6">Upload Product</h3>
-                        <form id="upload-form" onsubmit="handleUpload(event)" class="space-y-4">
+                        <form onsubmit="handleUpload(event)" class="space-y-4">
                             <div class="grid md:grid-cols-2 gap-4">
-                                <input type="text" id="prod-title" placeholder="Product Title" required class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
-                                <input type="number" id="prod-price" placeholder="Price (ZAR)" required class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
+                                <input type="text" id="prod-title" placeholder="Product Title" class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
+                                <input type="number" id="prod-price" placeholder="Price (ZAR)" class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
                             </div>
-                            <select id="prod-category" required class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE] text-slate-600">
+                            <select id="prod-category" class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE] text-slate-600">
                                 <option value="" disabled selected>Select a Category</option>
                                 <option value="templates">Templates</option>
                                 <option value="saas">SaaS Starter Kits</option>
@@ -311,23 +403,23 @@
                             <div>
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Cover Image</p>
                                 <div class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex justify-center bg-slate-50">
-                                    <input type="file" id="cover-uploader" accept="image/*" />
+                                    <input type="hidden" id="cover-uploader" role="uploadcare-uploader" name="cover_image" data-images-only="true" />
                                 </div>
                             </div>
                             <div>
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Product File</p>
                                 <div class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex justify-center bg-slate-50">
-                                    <input type="file" id="file-uploader" required />
+                                    <input type="hidden" id="file-uploader" role="uploadcare-uploader" name="my_file" />
                                 </div>
                             </div>
-                            <button id="upload-btn" type="submit" class="w-full bg-[#091426] text-white py-4 rounded-xl font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
+                            <button id="upload-btn" class="w-full bg-[#091426] text-white py-4 rounded-xl font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
                                 <i data-lucide="upload" style="width:16px;height:16px;"></i>
                                 Publish Product
                             </button>
                         </form>
                     </div>
                 </div>
-
+ 
                 <div class="mt-12">
                     <h3 class="font-bold text-xl mb-6">Your Listings</h3>
                     <div id="seller-list" class="space-y-3">
@@ -336,8 +428,10 @@
                 </div>
             </div>
         </div>
-
+ 
+        <!-- MOBILE BOTTOM NAV — context-aware -->
         <nav id="mobile-nav">
+            <!-- BUYER NAV (default) -->
             <div id="buyer-nav-tabs" class="contents">
                 <button class="nav-tab active" id="tab-home" onclick="navTo('home')">
                     <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -356,7 +450,8 @@
                     <span>Profile</span>
                 </button>
             </div>
-
+ 
+            <!-- SELLER NAV (shown when logged in as seller) -->
             <div id="seller-nav-tabs" class="contents hidden">
                 <button class="nav-tab" id="stab-home" onclick="switchView('buyer'); setActiveTab('stab-home')">
                     <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -377,9 +472,53 @@
             </div>
         </nav>
     </div>
-
+ 
+    <!-- TOAST CONTAINER -->
+ 
+    <!-- ── PRODUCT DETAIL PAGE ── -->
+    <div id="product-page">
+        <div class="product-page-header">
+            <button class="back-btn" onclick="closeProductPage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            </button>
+            <span id="pp-breadcrumb" class="text-sm font-bold text-slate-400 truncate"></span>
+        </div>
+        <div class="pt-4 pb-0">
+            <div class="image-gallery" id="pp-gallery"></div>
+            <div class="gallery-dots" id="pp-dots"></div>
+        </div>
+        <div class="p-5">
+            <div class="flex justify-between items-start gap-3 mb-1">
+                <h1 id="pp-title" class="text-2xl font-black text-[#091426] leading-tight flex-1"></h1>
+                <span id="pp-price" class="text-2xl font-black text-[#091426] flex-shrink-0"></span>
+            </div>
+            <p id="pp-seller" class="text-xs font-bold text-[#177DFE] mb-5"></p>
+            <div class="bg-slate-50 rounded-2xl p-4 mb-5">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">About this product</p>
+                <p id="pp-desc" class="text-sm text-slate-600 leading-relaxed"></p>
+            </div>
+            <div class="flex gap-3 mb-5">
+                <div class="flex-1 bg-emerald-50 rounded-2xl p-4 text-center">
+                    <p class="text-xs font-bold text-emerald-600 mb-1">⚡ Instant</p>
+                    <p class="text-xs text-slate-500 font-semibold">Download after payment</p>
+                </div>
+                <div class="flex-1 bg-blue-50 rounded-2xl p-4 text-center">
+                    <p class="text-xs font-bold text-[#177DFE] mb-1">🔒 Secure</p>
+                    <p class="text-xs text-slate-500 font-semibold">Encrypted file delivery</p>
+                </div>
+            </div>
+            <input type="email" id="pp-email" placeholder="Your email for receipt & download"
+                class="w-full bg-slate-50 p-4 rounded-xl font-semibold text-sm mb-3 outline-none focus:ring-2 focus:ring-[#177DFE] border border-transparent focus:border-[#177DFE]">
+            <button id="pp-buy-btn" class="w-full bg-[#091426] text-white py-4 rounded-xl font-black text-base hover:bg-[#177DFE] transition-colors flex items-center justify-center gap-2 mb-8">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Buy Now — <span id="pp-price-btn"></span>
+            </button>
+        </div>
+    </div>
+ 
     <div id="toast-container"></div>
-
+ 
+    <!-- PRODUCT DETAIL MODAL -->
     <div id="product-modal" class="modal-backdrop" onclick="closeProductModal(event)">
         <div class="product-modal-inner" id="product-modal-inner">
             <div class="product-modal-thumb" id="pm-thumb">
@@ -413,7 +552,8 @@
             </div>
         </div>
     </div>
-
+ 
+    <!-- AUTH MODAL -->
     <div id="auth-modal" class="modal-backdrop">
         <div class="bg-white p-8 rounded-[32px] w-[90%] max-w-sm relative shadow-2xl overflow-y-auto max-h-[90vh]">
             <button onclick="toggleModal()" class="absolute top-4 right-4 text-slate-400"><i data-lucide="x"></i></button>
@@ -436,7 +576,7 @@
             </p>
         </div>
     </div>
-
+ 
     <script>
         // ─── TOAST SYSTEM ────────────────────────────────────────────────────────
         function showToast(message, type = 'info', duration = 4000) {
@@ -456,7 +596,7 @@
             toast.classList.add('removing');
             setTimeout(() => toast.remove(), 250);
         }
-
+ 
         // ─── PRODUCT DETAIL MODAL ────────────────────────────────────────────────
         let currentProduct = null;
         function openProductModal(product) {
@@ -472,7 +612,7 @@
             document.getElementById('pm-title').textContent = product.title;
             document.getElementById('pm-seller').textContent = '@ ' + (product.seller_email || 'Verified Seller');
             document.getElementById('pm-desc').textContent = product.description || 'No description provided.';
-            document.getElementById('pm-price').textContent = 'R' + product.price;
+            document.getElementById('pm-price').textContent = 'R' + parseFloat(product.price).toFixed(2);
             document.getElementById('pm-email').value = '';
             document.getElementById('pm-buy-btn').onclick = () => executeBuy();
             document.getElementById('product-modal').classList.add('modal-visible');
@@ -498,24 +638,15 @@
                 currency: 'ZAR',
                 ref: '' + Math.floor((Math.random() * 1000000000) + 1),
                 metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: currentProduct.title }] },
-                callback: async function(response) {
-                    showToast('Payment successful! Generating secure link...', 'success', 6000);
-                    
-                    const { data, error } = await supabaseClient.storage
-                        .from('products')
-                        .createSignedUrl(currentProduct.file_url, 60);
-                        
-                    if (error || !data) {
-                        showToast('Error generating download link. Please contact support.', 'error');
-                    } else {
-                        window.open(data.signedUrl, '_blank');
-                    }
+                callback: function(response) {
+                    showToast('Payment successful! Opening your download...', 'success', 6000);
+                    setTimeout(() => window.open(currentProduct.file_url, '_blank'), 1000);
                 },
                 onClose: function() { showToast('Transaction cancelled.', 'info'); }
             });
             handler.openIframe();
         }
-
+ 
         // ─── SEARCH & FILTER ─────────────────────────────────────────────────────
         let allProducts = [];
         let activeCategory = 'all';
@@ -554,7 +685,7 @@
                 const hues = ['135deg, #091426, #1a3a5c', '135deg, #0f172a, #1e3a5f', '135deg, #1a1a2e, #16213e', '135deg, #0d1b2a, #1b4332'];
                 const hue = hues[Math.abs(d.title.charCodeAt(0) || 0) % hues.length];
                 grid.innerHTML += `
-                <div class="product-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer" onclick='openProductModal(${JSON.stringify(d).replace(/'/g, "&#39;")})'>
+                <div class="product-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer" onclick='openProductPage(${JSON.stringify(d).replace(/'/g, "&#39;")})'>
                     <div style="height:130px;background:linear-gradient(${hue});display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:16px 16px 0 0;">
                         ${d.cover_image
                             ? `<img src="${d.cover_image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px 16px 0 0;" alt="${d.title}">`
@@ -565,7 +696,7 @@
                         <h4 class="font-bold text-sm text-[#091426] mb-1" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.title}</h4>
                         <p class="text-xs text-slate-400 mb-3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayDesc}</p>
                         <div class="flex justify-between items-center">
-                            <span class="text-sm font-black text-[#091426]">R${d.price}</span>
+                            <span class="text-sm font-black text-[#091426]">R${parseFloat(d.price).toFixed(2)}</span>
                             <button class="bg-[#091426] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#177DFE] transition-colors flex items-center gap-1">
                                 <i data-lucide="zap" style="width:11px;height:11px;"></i> Buy
                             </button>
@@ -575,17 +706,17 @@
             });
             if (typeof lucide !== "undefined") lucide.createIcons();
         }
-
+ 
         // CONFIG
         // Keys loaded from config.js (gitignored)
         var SUPABASE_URL        = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.SUPABASE_URL        : '';
         var SUPABASE_KEY        = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.SUPABASE_KEY        : '';
         var PAYSTACK_PUBLIC_KEY = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.PAYSTACK_PUBLIC_KEY : '';
-
+ 
         var supabaseClient = null;
         var isSupabaseReady = false;
         var isLoginMode = true;
-
+ 
         function initSupabase() {
             if (!SUPABASE_URL || !SUPABASE_KEY || SUPABASE_URL === 'YOUR_SUPABASE_URL') return;
             try {
@@ -601,13 +732,13 @@
                 setTimeout(initSupabase, 300);
             }
         }
-
+ 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initSupabase);
         } else {
             initSupabase();
         }
-
+ 
         // VIEW & AUTH
         function switchView(view) {
             const buyer = document.getElementById('buyer-view');
@@ -635,12 +766,12 @@
                 });
             }
         }
-
+ 
         function toggleAppMode() {
             const isSeller = document.getElementById('buyer-view').classList.contains('hidden');
             switchView(isSeller ? 'buyer' : 'seller');
         }
-
+ 
         function toggleModal() { 
             document.getElementById('auth-modal').classList.toggle('modal-visible');
             if(document.getElementById('auth-modal').classList.contains('modal-visible')) {
@@ -648,19 +779,19 @@
                 updateAuthModalUI();
             }
         }
-
+ 
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             updateAuthModalUI();
         }
-
+ 
         function updateAuthModalUI() {
             const signupFields = document.getElementById('signup-fields');
             const title = document.getElementById('modal-title');
             const mainBtn = document.getElementById('main-auth-btn');
             const switchText = document.getElementById('auth-switch-text');
             const switchBtn = document.getElementById('auth-switch-btn');
-
+ 
             if (isLoginMode) {
                 signupFields.classList.add('hidden');
                 title.innerText = "Login";
@@ -677,7 +808,7 @@
                 switchBtn.innerText = "Login";
             }
         }
-
+ 
         async function checkUser() {
             if (!isSupabaseReady) return;
             const { data: { user } } = await supabaseClient.auth.getUser();
@@ -688,7 +819,7 @@
                 if (!document.getElementById('seller-view').classList.contains('hidden')) loadSellerProducts(user.id);
             }
         }
-
+ 
         function updateNavUI(user) {
             const container = document.getElementById('auth-buttons-desktop');
             if (user) {
@@ -699,22 +830,22 @@
                 showBuyerNav();
             }
         }
-
+ 
         async function handleSignup() {
             const fullName = document.getElementById('full-name').value;
             const phone = document.getElementById('phone').value;
             const shopName = document.getElementById('shop-name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-
+ 
             if (!fullName || !phone || !shopName || !email || !password) {
                 showToast('Please fill in all fields', 'error'); return;
             }
-
+ 
             const { data, error } = await supabaseClient.auth.signUp({ 
                 email, password, options: { data: { full_name: fullName, phone: phone, shop_name: shopName } }
             });
-
+ 
             if (error) showToast(error.message, 'error');
             else if (data.session) {
                 showToast('Shop created! Welcome, ' + shopName + ' 🎉', 'success');
@@ -726,12 +857,12 @@
                 toggleModal();
             }
         }
-
+ 
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             if (!email || !password) { showToast('Please fill in all fields', 'error'); return; }
-
+ 
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) { showToast(error.message, 'error'); }
             else {
@@ -741,120 +872,109 @@
                 switchView('seller');
             }
         }
-
+ 
         async function handleLogout() {
             await supabaseClient.auth.signOut();
             showToast('Logged out successfully', 'info');
             setTimeout(() => window.location.reload(true), 800);
         }
-
-        // Supabase Storage implementation
+ 
+        let uploadedUrl = null;
+        let coverUrl = null;
+        if (typeof uploadcare !== 'undefined') {
+            const fileWidget  = uploadcare.Widget('#file-uploader');
+            const coverWidget = uploadcare.Widget('#cover-uploader');
+            fileWidget.onUploadComplete(info  => { uploadedUrl = info.cdnUrl; });
+            coverWidget.onUploadComplete(info => { coverUrl = info.cdnUrl; });
+        }
+ 
         async function handleUpload(e) {
             e.preventDefault();
-            
             const btn = document.getElementById('upload-btn');
             const fileInput = document.getElementById('file-uploader');
-            const coverInput = document.getElementById('cover-uploader');
-            
             if (!isSupabaseReady) return showToast('System offline', 'error');
-            
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) return showToast('Please login to upload', 'error');
-            
-            if (fileInput.files.length === 0) {
-                return showToast('You must select a product file to sell.', 'error');
-            }
-
+            if (!fileInput.files[0]) return showToast('Please select a product file', 'error');
+ 
             try {
-                btn.innerHTML = `<div class="dexa-spinner" style="width:16px;height:16px;border-width:2px;"></div> Uploading files...`;
+                btn.innerHTML = '<div class="dexa-spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;margin-right:8px;"></div> Uploading...';
                 btn.disabled = true;
-
-                const shopName = user.user_metadata.shop_name || "DEXA Seller";
-                const desc = document.getElementById('prod-desc').value || "No description";
+ 
+                const shopName = user.user_metadata.shop_name || 'DEXA Seller';
+                const title    = document.getElementById('prod-title').value.trim();
+                const price    = parseFloat(document.getElementById('prod-price').value);
+                const desc     = document.getElementById('prod-desc').value || 'No description';
                 const category = document.getElementById('prod-category').value || 'other';
-                const title = document.getElementById('prod-title').value;
-
-                let finalCoverUrl = null;
-                let finalFilePath = null;
-
-                // 1. Upload Cover Image (Public)
-                if (coverInput.files.length > 0) {
-                    const coverFile = coverInput.files[0];
-                    const coverExt = coverFile.name.split('.').pop();
-                    const coverPath = `${user.id}/${Date.now()}_cover.${coverExt}`;
-
-                    const { error: coverErr } = await supabaseClient.storage
-                        .from('covers')
-                        .upload(coverPath, coverFile);
-
-                    if (coverErr) throw coverErr;
-
-                    // Get the public URL so we can display it on the store
-                    const { data: publicData } = supabaseClient.storage
-                        .from('covers')
-                        .getPublicUrl(coverPath);
-                        
-                    finalCoverUrl = publicData.publicUrl;
-                }
-
-                // 2. Upload Actual Product File (Private Vault)
+ 
+                // 1. Upload product file (private)
                 const prodFile = fileInput.files[0];
-                const prodExt = prodFile.name.split('.').pop();
-                const prodPath = `${user.id}/${Date.now()}_product.${prodExt}`;
-
-                const { error: fileErr } = await supabaseClient.storage
-                    .from('products')
-                    .upload(prodPath, prodFile);
-
+                const prodPath = `${user.id}/${Date.now()}_${prodFile.name.replace(/[^a-z0-9.]/gi,'_')}`;
+                const { error: fileErr } = await supabaseClient.storage.from('products').upload(prodPath, prodFile);
                 if (fileErr) throw fileErr;
-                
-                // Store the raw bucket path
-                finalFilePath = prodPath; 
-
-                // 3. Save Everything to Database
-                btn.innerText = "Saving to store...";
-                const { error: dbErr } = await supabaseClient.from('products').insert({
-                    title: title,
-                    price: document.getElementById('prod-price').value,
-                    description: desc,
-                    file_url: finalFilePath, // This is now a private path, not a public link!
-                    cover_image: finalCoverUrl,
-                    category: category,
+ 
+                // 2. Upload images — up to 5
+                let firstCoverUrl = null;
+                const imageUrls = [];
+                for (let i = 0; i < selectedImages.length; i++) {
+                    const img = selectedImages[i];
+                    const imgPath = `${user.id}/${Date.now()}_${i}_${img.name.replace(/[^a-z0-9.]/gi,'_')}`;
+                    const { error: imgErr } = await supabaseClient.storage.from('covers').upload(imgPath, img);
+                    if (imgErr) throw imgErr;
+                    const { data: urlData } = supabaseClient.storage.from('covers').getPublicUrl(imgPath);
+                    imageUrls.push(urlData.publicUrl);
+                    if (i === 0) firstCoverUrl = urlData.publicUrl;
+                }
+ 
+                // 3. Insert product record
+                const { data: productData, error: dbErr } = await supabaseClient.from('products').insert({
+                    title, price, description: desc,
+                    file_url: prodPath,
+                    cover_image: firstCoverUrl,
+                    category,
                     seller_id: user.id,
                     seller_email: shopName
-                });
-
+                }).select().single();
                 if (dbErr) throw dbErr;
-
+ 
+                // 4. Save images to product_images table
+                if (imageUrls.length > 0 && productData) {
+                    await supabaseClient.from('product_images').insert(
+                        imageUrls.map(url => ({ product_id: productData.id, image_url: url }))
+                    );
+                }
+ 
                 showToast('Product published! 🚀', 'success');
-                
-                // Clean up the form
                 document.getElementById('upload-form').reset();
-                
-                // Refresh data
+                selectedImages = [];
+                document.getElementById('img-preview-grid').innerHTML = '';
                 loadSellerProducts(user.id);
                 loadPublicMarket();
-
-            } catch (error) {
-                console.error(error);
-                showToast(error.message || 'Upload failed. Please try again.', 'error');
+ 
+            } catch(err) {
+                console.error(err);
+                showToast(err.message || 'Upload failed. Try again.', 'error');
             } finally {
-                btn.innerHTML = `<i data-lucide="upload" style="width:16px;height:16px;"></i> Publish Product`;
+                btn.innerHTML = '<i data-lucide="upload" style="width:16px;height:16px;"></i> Publish Product';
                 btn.disabled = false;
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }
         }
-
+ 
+        function buyProduct(title, price, fileUrl) {
+            // Legacy — now handled by openProductModal
+        }
+ 
         async function loadSellerProducts(uid) {
             const { data } = await supabaseClient.from('products').select('*').eq('seller_id', uid);
             const list = document.getElementById('seller-list');
             list.innerHTML = "";
             if (!data || data.length === 0) { list.innerHTML = '<p class="text-slate-400 text-sm">No products yet.</p>'; return; }
             data.forEach(d => {
-                list.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center"><span class="font-bold text-sm">${d.title}</span><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">R${d.price}</span></div>`;
+                list.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center"><span class="font-bold text-sm">${d.title}</span><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">R${parseFloat(d.price).toFixed(2)}</span></div>`;
             });
         }
-
+ 
         async function loadPublicMarket() {
             if (!isSupabaseReady) return;
             const grid = document.getElementById('public-product-grid');
@@ -867,24 +987,139 @@
             allProducts = data || [];
             filterProducts();
         }
-
+ 
+ 
+ 
+        // ── PRODUCT PAGE ──────────────────────────────────────────────
+        let currentPageProduct = null;
+        let selectedImages = [];
+ 
+        function openProductPage(product) {
+            currentPageProduct = product;
+            document.getElementById('pp-breadcrumb').textContent = product.title;
+            document.getElementById('pp-title').textContent = product.title;
+            document.getElementById('pp-seller').textContent = '@ ' + (product.seller_email || 'Verified Seller');
+            document.getElementById('pp-desc').textContent = product.description || 'No description provided.';
+            const priceStr = 'R' + parseFloat(product.price).toFixed(2);
+            document.getElementById('pp-price').textContent = priceStr;
+            document.getElementById('pp-price-btn').textContent = priceStr;
+            document.getElementById('pp-email').value = '';
+            document.getElementById('pp-buy-btn').onclick = executePageBuy;
+            buildGallery(product);
+            document.getElementById('product-page').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+ 
+        async function buildGallery(product) {
+            const gallery = document.getElementById('pp-gallery');
+            const dots = document.getElementById('pp-dots');
+            gallery.innerHTML = '';
+            dots.innerHTML = '';
+            let images = [];
+            if (isSupabaseReady && product.id) {
+                const { data } = await supabaseClient
+                    .from('product_images')
+                    .select('image_url')
+                    .eq('product_id', product.id);
+                if (data && data.length > 0) images = data.map(r => r.image_url);
+            }
+            if (images.length === 0 && product.cover_image) images = [product.cover_image];
+            if (images.length === 0) {
+                gallery.innerHTML = '<div class="gallery-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
+                return;
+            }
+            images.forEach((url, i) => {
+                const img = document.createElement('img');
+                img.src = url; img.className = 'gallery-img'; img.alt = product.title;
+                gallery.appendChild(img);
+                const dot = document.createElement('div');
+                dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
+                dots.appendChild(dot);
+            });
+            if (images.length > 1) {
+                gallery.addEventListener('scroll', () => {
+                    const idx = Math.round(gallery.scrollLeft / gallery.offsetWidth);
+                    dots.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+                });
+            }
+        }
+ 
+        function closeProductPage() {
+            document.getElementById('product-page').classList.remove('open');
+            document.body.style.overflow = '';
+            currentPageProduct = null;
+        }
+ 
+        async function executePageBuy() {
+            const email = document.getElementById('pp-email').value.trim();
+            if (!email || !email.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
+            if (!currentPageProduct) return;
+            if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes('YOUR')) { showToast('Payment system offline.', 'error'); return; }
+            const product = currentPageProduct;
+            let handler = PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email: email,
+                amount: Math.round(parseFloat(product.price) * 100),
+                currency: 'ZAR',
+                ref: '' + Math.floor((Math.random() * 1000000000) + 1),
+                metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: product.title }] },
+                callback: async function(response) {
+                    showToast('Payment successful! Generating secure download...', 'success', 6000);
+                    const { data, error } = await supabaseClient.storage.from('products').createSignedUrl(product.file_url, 300);
+                    if (error || !data) { showToast('Error generating link. Contact support.', 'error'); }
+                    else { window.open(data.signedUrl, '_blank'); }
+                },
+                onClose: function() { showToast('Transaction cancelled.', 'info'); }
+            });
+            handler.openIframe();
+        }
+ 
+        function previewImages(input) {
+            selectedImages = Array.from(input.files).slice(0, 5);
+            renderPreviews();
+        }
+ 
+        function removePreviewImage(index) {
+            selectedImages.splice(index, 1);
+            renderPreviews();
+        }
+ 
+        function renderPreviews() {
+            const grid = document.getElementById('img-preview-grid');
+            grid.innerHTML = '';
+            selectedImages.forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const div = document.createElement('div');
+                    div.className = 'img-preview-item';
+                    div.innerHTML = `<img src="${e.target.result}" alt="preview"><button class="img-preview-remove" onclick="removePreviewImage(${i})">✕</button>`;
+                    grid.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+ 
+        window.addEventListener('popstate', () => {
+            if (document.getElementById('product-page').classList.contains('open')) closeProductPage();
+        });
+ 
         // ── MOBILE NAV LOGIC ──────────────────────────────────────────
         function setActiveTab(id) {
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             const el = document.getElementById(id);
             if (el) el.classList.add('active');
         }
-
+ 
         function showBuyerNav() {
             document.getElementById('buyer-nav-tabs').classList.remove('hidden');
             document.getElementById('seller-nav-tabs').classList.add('hidden');
         }
-
+ 
         function showSellerNav() {
             document.getElementById('buyer-nav-tabs').classList.add('hidden');
             document.getElementById('seller-nav-tabs').classList.remove('hidden');
         }
-
+ 
         function navTo(tab) {
             // Clear all active
             document.querySelectorAll('#buyer-nav-tabs .nav-tab').forEach(t => t.classList.remove('active'));
@@ -910,9 +1145,13 @@
                 } else { toggleModal(); }
             }
         }
-
+ 
+        // switchView is already nav-aware — no override needed
+ 
+        // Init handled by initSupabase() above — no duplicate onload needed
     </script>
-
+ 
+    <!-- ── DEXA SIGNATURE MUSIC PLAYER ── -->
     <div id="dexa-player" onclick="toggleMusic()" title="Tap to mute/unmute">
         <div class="dexa-disc" id="dexa-disc">
             <div class="mute-x">
@@ -926,18 +1165,19 @@
             </div>
         </div>
     </div>
-
+ 
+    <!-- Audio element — point src to your MP3 -->
     <audio id="dexa-audio" loop preload="auto">
         <source src="assets/dexa_vibes.mp3" type="audio/mpeg">
     </audio>
-
+ 
     <script>
         const audio  = document.getElementById('dexa-audio');
         const player = document.getElementById('dexa-player');
-
+ 
         audio.volume = 0.18;
         let userMuted = localStorage.getItem('dexa_muted') === 'true';
-
+ 
         function setPlayerState(playing) {
             if (playing) {
                 player.classList.remove('muted');
@@ -945,7 +1185,7 @@
                 player.classList.add('muted');
             }
         }
-
+ 
         function toggleMusic() {
             userMuted = !userMuted;
             localStorage.setItem('dexa_muted', userMuted);
@@ -957,7 +1197,7 @@
                 setPlayerState(true);
             }
         }
-
+ 
         // Autoplay on load — browsers require a user gesture first,
         // so we attempt autoplay and fall back gracefully if blocked
         function tryAutoplay() {
@@ -980,10 +1220,10 @@
                 document.addEventListener('click', playOnInteract);
             });
         }
-
+ 
         // Slight delay so page loads first
         setTimeout(tryAutoplay, 1200);
     </script>
-
+ 
 </body>
 </html>
