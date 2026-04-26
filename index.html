@@ -141,6 +141,14 @@
             cursor: pointer; color: white; font-size: 10px; font-weight: bold; border: none;
         }
  
+ 
+        /* ── LIVE BILLBOARD ── */
+        #billboard { transition: all 0.5s ease; }
+        .bb-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;cursor:pointer; }
+        .bb-dot.active { background:white;width:18px;border-radius:3px; }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+        #bb-avatar { transition: all 0.5s; }
+ 
         /* CARD HOVER */
         .product-card { transition: transform 0.2s, box-shadow 0.2s; }
         .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(9,20,38,0.12); }
@@ -329,13 +337,52 @@
  
         <!-- BUYER VIEW -->
         <div id="buyer-view" class="fade-in p-4 md:p-8 pb-24 md:pb-8">
-            <div class="relative overflow-hidden rounded-[32px] bg-[#091426] p-8 md:p-12 text-white shadow-2xl mb-8">
-                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div class="text-center md:text-left">
-                        <span class="bg-red-500 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest mb-4 inline-block">Live Billboard</span>
-                        <h1 class="text-3xl md:text-5xl font-black mb-4 leading-tight">The Mzansi Stack</h1>
-                        <p class="text-slate-400 mb-6 max-w-md">Discover SaaS kits, templates, and audio packs built by Africa's top creators.</p>
-                        <button class="bg-white text-[#091426] px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform">Explore Now</button>
+            <!-- ── LIVE BILLBOARD ── -->
+            <div id="billboard" class="relative overflow-hidden rounded-[32px] bg-[#091426] text-white shadow-2xl mb-8" style="min-height:220px;">
+                <!-- Background glow -->
+                <div id="bb-glow" style="position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(23,125,254,0.18),transparent 65%);pointer-events:none;transition:background 1s;"></div>
+ 
+                <!-- Content -->
+                <div class="relative z-10 p-7 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div class="flex-1">
+                        <!-- Header row -->
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="bg-red-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                <span style="width:5px;height:5px;background:white;border-radius:50%;display:inline-block;animation:pulse 1.2s infinite;"></span>
+                                Live Billboard
+                            </span>
+                            <span id="bb-timer" class="text-[10px] font-bold text-slate-400 tracking-widest"></span>
+                        </div>
+ 
+                        <!-- Seller info -->
+                        <div class="flex items-center gap-3 mb-3">
+                            <div id="bb-avatar" style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#177DFE,#0a4a99);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0;"></div>
+                            <div>
+                                <p id="bb-shop" class="font-black text-lg text-white leading-tight"></p>
+                                <p id="bb-tagline" class="text-slate-400 text-xs font-semibold"></p>
+                            </div>
+                        </div>
+ 
+                        <!-- Featured product -->
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Featured Product</p>
+                        <p id="bb-product" class="font-black text-xl text-white mb-1 leading-snug"></p>
+                        <p id="bb-price" class="text-[#177DFE] font-black text-sm"></p>
+                    </div>
+ 
+                    <!-- Product thumbnail -->
+                    <div id="bb-thumb" style="width:140px;height:140px;border-radius:20px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#0f1f3d,#1a3a5c);display:flex;align-items:center;justify-content:center;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
+                </div>
+ 
+                <!-- Action buttons -->
+                <div class="relative z-10 px-7 md:px-10 pb-7 flex gap-3">
+                    <button id="bb-explore-btn" class="bg-white text-[#091426] px-5 py-2.5 rounded-xl font-bold text-sm hover:scale-105 transition-transform flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Explore Product
+                    </button>
+                    <div class="flex gap-1.5 items-center ml-auto">
+                        <div id="bb-dots" class="flex gap-1.5"></div>
                     </div>
                 </div>
             </div>
@@ -766,6 +813,7 @@
                 isSupabaseReady = true;
                 checkUser();
                 loadPublicMarket();
+                loadBillboard();
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             } catch(e) {
                 console.warn('Supabase not ready, retrying in 300ms...', e.message);
@@ -1092,6 +1140,122 @@
         }
  
  
+ 
+ 
+        // ── LIVE BILLBOARD ──────────────────────────────────────────────
+        let billboardSellers = [];
+        let billboardIndex = 0;
+        let billboardInterval = null;
+ 
+        async function loadBillboard() {
+            if (!isSupabaseReady) return;
+ 
+            // Get all unique sellers who have visible products
+            const { data: products } = await supabaseClient
+                .from('products')
+                .select('*')
+                .or('hidden.eq.false,hidden.is.null')
+                .order('created_at', { ascending: false });
+ 
+            if (!products || products.length === 0) return;
+ 
+            // Group products by seller
+            const sellerMap = {};
+            products.forEach(p => {
+                if (!sellerMap[p.seller_id]) {
+                    sellerMap[p.seller_id] = {
+                        shop: p.seller_email || 'DEXA Seller',
+                        products: []
+                    };
+                }
+                sellerMap[p.seller_id].products.push(p);
+            });
+ 
+            billboardSellers = Object.values(sellerMap);
+ 
+            // Determine which slot we're in based on 2-hour windows
+            // Each seller gets a 2-hour window in rotation
+            const hoursElapsed = Math.floor(Date.now() / (1000 * 60 * 60 * 2));
+            billboardIndex = hoursElapsed % billboardSellers.length;
+ 
+            renderBillboard();
+            buildBillboardDots();
+            startBillboardTimer();
+        }
+ 
+        function renderBillboard() {
+            if (!billboardSellers.length) return;
+            const seller = billboardSellers[billboardIndex];
+            // Pick the featured product — first with cover image, else first product
+            const featured = seller.products.find(p => p.cover_image) || seller.products[0];
+ 
+            // Shop name & avatar
+            const shopName = seller.shop;
+            document.getElementById('bb-shop').textContent = shopName;
+            document.getElementById('bb-tagline').textContent =
+                seller.products.length === 1
+                    ? '1 product on DEXA'
+                    : seller.products.length + ' products on DEXA';
+            document.getElementById('bb-avatar').textContent = shopName.charAt(0).toUpperCase();
+ 
+            // Featured product
+            document.getElementById('bb-product').textContent = featured.title;
+            document.getElementById('bb-price').textContent = 'R' + parseFloat(featured.price).toFixed(2);
+ 
+            // Thumbnail
+            const thumb = document.getElementById('bb-thumb');
+            if (featured.cover_image) {
+                thumb.innerHTML = `<img src="${featured.cover_image}" style="width:100%;height:100%;object-fit:cover;">`;
+            } else {
+                thumb.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+            }
+ 
+            // Explore button — opens product page directly
+            document.getElementById('bb-explore-btn').onclick = () => openProductPage(featured);
+ 
+            // Update active dot
+            document.querySelectorAll('.bb-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === billboardIndex);
+            });
+        }
+ 
+        function buildBillboardDots() {
+            const dotsEl = document.getElementById('bb-dots');
+            dotsEl.innerHTML = '';
+            if (billboardSellers.length <= 1) return;
+            billboardSellers.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'bb-dot' + (i === billboardIndex ? ' active' : '');
+                dot.onclick = () => { billboardIndex = i; renderBillboard(); };
+                dotsEl.appendChild(dot);
+            });
+        }
+ 
+        function startBillboardTimer() {
+            // Calculate ms until next 2-hour boundary
+            const now = Date.now();
+            const twoHours = 1000 * 60 * 60 * 2;
+            const msUntilNext = twoHours - (now % twoHours);
+ 
+            function updateTimerDisplay() {
+                const remaining = msUntilNext - (Date.now() - now);
+                if (remaining <= 0) {
+                    billboardIndex = (billboardIndex + 1) % billboardSellers.length;
+                    renderBillboard();
+                    startBillboardTimer(); // restart for next window
+                    return;
+                }
+                const h = Math.floor(remaining / 3600000);
+                const m = Math.floor((remaining % 3600000) / 60000);
+                const s = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('bb-timer').textContent =
+                    'Next in ' + (h > 0 ? h + 'h ' : '') + m + 'm ' + s + 's';
+            }
+ 
+            updateTimerDisplay();
+            if (billboardInterval) clearInterval(billboardInterval);
+            billboardInterval = setInterval(updateTimerDisplay, 1000);
+        }
  
         // ── PRODUCT PAGE ──────────────────────────────────────────────
         let currentPageProduct = null;
