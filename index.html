@@ -391,7 +391,7 @@
             <div class="mb-6 flex flex-col gap-4">
                 <div class="search-wrapper">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input id="search-input" type="text" placeholder="Search products..." oninput="filterProducts()">
+                    <input id="search-input" type="search" placeholder="Search products..." oninput="this.dataset.userTyped='1';filterProducts()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="dexa-search">
                 </div>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                     <button class="filter-pill active" data-cat="all" onclick="setCategory(this, 'all')">All</button>
@@ -410,37 +410,37 @@
             </div>
  
             <!-- Marketplace Footer -->
-            <footer class="mt-16 border-t border-slate-100 pt-10 pb-6">
-                <div class="text-center mb-6">
+            <footer style="margin-top:64px;background:#07090f;border-radius:24px;padding:40px 32px 28px;margin-left:-16px;margin-right:-16px;">
+                <div class="text-center mb-8">
                     <div class="flex items-center justify-center gap-2 mb-2">
-                        <img src="assets/dexa_logo_final.png" style="height:28px;">
-                        <span class="font-black text-slate-600 text-lg tracking-tighter">DEXA</span>
+                        <img src="assets/dexa_logo_final.png" style="height:28px;filter:invert(1);opacity:0.9;">
+                        <span style="font-weight:900;color:white;font-size:20px;letter-spacing:-0.5px;">DEXA</span>
                     </div>
-                    <p class="text-xs text-slate-400">Africa's Digital Marketplace · Built in 🇿🇦</p>
+                    <p style="font-size:11px;color:#4a5568;">Africa's Digital Marketplace · Built in 🇿🇦</p>
                 </div>
  
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8 text-sm">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Company</p>
-                        <p class="text-xs text-slate-500 font-semibold mb-1">Ratio Capital Holdings (Pty) Ltd</p>
-                        <p class="text-xs text-slate-400">Reg. No: 2026/217968/07</p>
+                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Company</p>
+                        <p style="font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:4px;">Ratio Capital Holdings (Pty) Ltd</p>
+                        <p style="font-size:11px;color:#4a5568;">Reg. No: 2026/217968/07</p>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Legal</p>
-                        <a href="https://www.dexamarket.co.za/#privacy" target="_blank" class="block text-xs text-slate-500 hover:text-[#177DFE] font-semibold mb-1 transition-colors">Privacy Policy</a>
-                        <a href="https://www.dexamarket.co.za/terms.html" target="_blank" class="block text-xs text-slate-500 hover:text-[#177DFE] font-semibold mb-1 transition-colors">Terms & Conditions</a>
-                        <p class="text-xs text-slate-400">POPIA Compliant</p>
+                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Legal</p>
+                        <a href="https://www.dexamarket.co.za/#privacy" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Privacy Policy</a>
+                        <a href="https://www.dexamarket.co.za/terms.html" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Terms & Conditions</a>
+                        <p style="font-size:11px;color:#4a5568;">POPIA Compliant</p>
                     </div>
                     <div class="col-span-2 md:col-span-1">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Support</p>
-                        <a href="mailto:support@dexamarket.co.za" class="block text-xs text-slate-500 hover:text-[#177DFE] font-semibold mb-1 transition-colors">support@dexamarket.co.za</a>
-                        <a href="https://www.dexamarket.co.za" target="_blank" class="block text-xs text-slate-500 hover:text-[#177DFE] font-semibold transition-colors">dexamarket.co.za</a>
+                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Support</p>
+                        <a href="mailto:support@dexamarket.co.za" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">support@dexamarket.co.za</a>
+                        <a href="https://www.dexamarket.co.za" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">dexamarket.co.za</a>
                     </div>
                 </div>
  
-                <div class="border-t border-slate-100 pt-4 text-center">
-                    <p class="text-xs text-slate-300">© 2026 DEXA · Ratio Capital Holdings (Pty) Ltd · All rights reserved.</p>
-                    <p class="text-xs text-slate-300 mt-1">Payments secured by Paystack · Files delivered via Supabase Encrypted Storage</p>
+                <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;text-align:center;">
+                    <p style="font-size:11px;color:#2d3748;">© 2026 DEXA · Ratio Capital Holdings (Pty) Ltd · All rights reserved.</p>
+                    <p style="font-size:11px;color:#2d3748;margin-top:4px;">Payments secured by Paystack · Files delivered via Supabase Encrypted Storage</p>
                 </div>
             </footer>
         </div>
@@ -1128,6 +1128,9 @@
  
         async function loadPublicMarket() {
             if (!isSupabaseReady) return;
+            // Clear any browser-autofilled search value
+            const searchEl = document.getElementById('search-input');
+            if (searchEl && searchEl.value && !searchEl.dataset.userTyped) searchEl.value = '';
             const grid = document.getElementById('public-product-grid');
             grid.innerHTML = '<div class="loading-state col-span-full"><div class="dexa-spinner"></div><p>Loading marketplace...</p></div>';
             const { data, error } = await supabaseClient.from('products').select('*').or('hidden.eq.false,hidden.is.null').limit(50);
