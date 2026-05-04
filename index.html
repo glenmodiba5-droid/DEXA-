@@ -98,11 +98,12 @@
         }
         .image-gallery::-webkit-scrollbar { display: none; }
         .gallery-img {
-            flex-shrink: 0; width: 100%; height: 260px;
-            object-fit: cover; scroll-snap-align: start;
+            flex-shrink: 0; width: 100%; height: auto; aspect-ratio: 16/9; max-height: 480px;
+            object-fit: contain; background-color: #f1f5f9; scroll-snap-align: start;
+            border-radius: 20px;
         }
         .gallery-placeholder {
-            flex-shrink: 0; width: 100%; height: 260px;
+            flex-shrink: 0; width: 100%; aspect-ratio: 16/9; max-height: 480px;
             border-radius: 20px;
             background: linear-gradient(135deg, #091426 0%, #1a3a5c 100%);
             display: flex; align-items: center; justify-content: center;
@@ -772,7 +773,7 @@
                 const hue = hues[Math.abs(d.title.charCodeAt(0) || 0) % hues.length];
                 grid.innerHTML += `
                 <div class="product-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer" onclick='openProductPage(${JSON.stringify(d).replace(/'/g, "&#39;")})'>
-                    <div style="height:130px;background:linear-gradient(${hue});display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:16px 16px 0 0;">
+                    <div style="aspect-ratio: 16/9; width: 100%; background:linear-gradient(${hue});display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:16px 16px 0 0;">
                         ${d.cover_image
                             ? `<img src="${d.cover_image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px 16px 0 0;" alt="${d.title}">`
                             : `<div style="position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(23,125,254,0.25),transparent 60%);"></div><i data-lucide="package" style="width:36px;height:36px;color:rgba(255,255,255,0.25);position:relative;z-index:1;"></i>`
