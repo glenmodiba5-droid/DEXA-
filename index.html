@@ -554,11 +554,19 @@
     <div id="toast-container"></div>
 
     <!-- ── PRODUCT DETAIL PAGE ── -->
-    <div id="product-page">
-        <div class="product-page-header">
+   <div class="product-page-header">
             <button class="back-btn" onclick="closeProductPage()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
             </button>
+            
+            <!-- Added flex-1 to push the share button to the right edge -->
+            <span id="pp-breadcrumb" class="text-sm font-bold text-slate-400 truncate flex-1"></span>
+            
+            <!-- NEW SHARE BUTTON -->
+            <button class="back-btn" onclick="shareProduct()" title="Share Product">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            </button>
+        </div>
             <span id="pp-breadcrumb" class="text-sm font-bold text-slate-400 truncate"></span>
         </div>
         <div class="pt-4 pb-0">
@@ -1342,6 +1350,38 @@
             document.getElementById('product-page').classList.remove('open');
             document.body.style.overflow = '';
             currentPageProduct = null;
+            
+            async function shareProduct() {
+            if (!currentPageProduct) return;
+            
+            const shareData = {
+                title: currentPageProduct.title,
+                text: `Check out ${currentPageProduct.title} on DEXA!`,
+                url: window.location.href // This grabs the exact ?p=123 link!
+            };
+
+            try {
+                // Try the native mobile share menu first
+                if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback for Desktop/Laptops: Just copy the link
+                    await navigator.clipboard.writeText(shareData.url);
+                    showToast('Product link copied to clipboard! 📋', 'success');
+                }
+            } catch (err) {
+                // If they cancel the mobile share menu, do nothing. 
+                // But if it actually fails, fallback to copying the link.
+                if (err.name !== 'AbortError') {
+                    try {
+                        await navigator.clipboard.writeText(shareData.url);
+                        showToast('Product link copied to clipboard! 📋', 'success');
+                    } catch(e) {
+                        showToast('Failed to copy link.', 'error');
+                    }
+                }
+            }
+        }
 
             // Safely clear the URL
             if (window.location.search.includes('p=')) {
