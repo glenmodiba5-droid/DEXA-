@@ -814,10 +814,26 @@
                 checkUser();
                 loadPublicMarket();
                 loadBillboard();
+                checkUrlForProduct(); // <-- NEW: Check URL for direct links
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             } catch(e) {
                 console.warn('Supabase not ready, retrying in 300ms...', e.message);
                 setTimeout(initSupabase, 300);
+            }
+        }
+
+        // NEW: Fetch product if linked directly
+        async function checkUrlForProduct() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('p');
+            if (productId) {
+                const { data, error } = await supabaseClient.from('products').select('*').eq('id', productId).single();
+                if (data && !error) {
+                    openProductPage(data, true); // true = skip pushing to history to avoid loops
+                } else {
+                    showToast('Product not found or removed.', 'error');
+                    window.history.replaceState({}, '', window.location.pathname);
+                }
             }
         }
 
@@ -1257,7 +1273,7 @@
         let currentPageProduct = null;
         let selectedImages = [];
 
-        function openProductPage(product) {
+        function openProductPage(product, skipHistory = false) {
             currentPageProduct = product;
             document.getElementById('pp-breadcrumb').textContent = product.title;
             document.getElementById('pp-title').textContent = product.title;
@@ -1268,49 +1284,26 @@
             document.getElementById('pp-price-btn').textContent = priceStr;
             document.getElementById('pp-email').value = '';
             document.getElementById('pp-buy-btn').onclick = executePageBuy;
+            
+            // NEW: Update the URL so creators can copy/paste it
+            if (!skipHistory) {
+                window.history.pushState({ p: product.id }, '', '?p=' + product.id);
+            }
+
             buildGallery(product);
             document.getElementById('product-page').classList.add('open');
             document.body.style.overflow = 'hidden';
-        }
-
-        async function buildGallery(product) {
-            const gallery = document.getElementById('pp-gallery');
-            const dots = document.getElementById('pp-dots');
-            gallery.innerHTML = '';
-            dots.innerHTML = '';
-            let images = [];
-            if (isSupabaseReady && product.id) {
-                const { data } = await supabaseClient
-                    .from('product_images')
-                    .select('image_url')
-                    .eq('product_id', product.id);
-                if (data && data.length > 0) images = data.map(r => r.image_url);
-            }
-            if (images.length === 0 && product.cover_image) images = [product.cover_image];
-            if (images.length === 0) {
-                gallery.innerHTML = '<div class="gallery-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
-                return;
-            }
-            images.forEach((url, i) => {
-                const img = document.createElement('img');
-                img.src = url; img.className = 'gallery-img'; img.alt = product.title;
-                gallery.appendChild(img);
-                const dot = document.createElement('div');
-                dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
-                dots.appendChild(dot);
-            });
-            if (images.length > 1) {
-                gallery.addEventListener('scroll', () => {
-                    const idx = Math.round(gallery.scrollLeft / gallery.offsetWidth);
-                    dots.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-                });
-            }
         }
 
         function closeProductPage() {
             document.getElementById('product-page').classList.remove('open');
             document.body.style.overflow = '';
             currentPageProduct = null;
+
+            // NEW: Clear the URL when closing the product page
+            if (window.location.search.includes('p=')) {
+                window.history.pushState({}, '', window.location.pathname);
+            }
         }
 
         async function executePageBuy() {
@@ -1362,8 +1355,18 @@
             });
         }
 
+        // NEW: Handle the browser's physical Back/Forward buttons smoothly
         window.addEventListener('popstate', () => {
-            if (document.getElementById('product-page').classList.contains('open')) closeProductPage();
+            const productId = new URLSearchParams(window.location.search).get('p');
+            if (productId) {
+                // They clicked back/forward to a specific product link
+                checkUrlForProduct();
+            } else {
+                // They clicked back to the main marketplace grid
+                document.getElementById('product-page').classList.remove('open');
+                document.body.style.overflow = '';
+                currentPageProduct = null;
+            }
         });
 
         // ── MOBILE NAV LOGIC ──────────────────────────────────────────
