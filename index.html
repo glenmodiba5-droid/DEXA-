@@ -1281,7 +1281,7 @@
         let currentPageProduct = null;
         let selectedImages = [];
 
-        function openProductPage(product, skipHistory = false) {
+   function openProductPage(product, skipHistory = false) {
             currentPageProduct = product;
             document.getElementById('pp-breadcrumb').textContent = product.title;
             document.getElementById('pp-title').textContent = product.title;
@@ -1391,13 +1391,29 @@
             }
         }
 
-            // Safely clear the URL
-            if (window.location.search.includes('p=')) {
-                try {
-                    window.history.pushState({}, '', window.location.pathname);
-                } catch(err) {}
-            }
-        
+        async function executePageBuy() {
+            const email = document.getElementById('pp-email').value.trim();
+            if (!email || !email.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
+            if (!currentPageProduct) return;
+            if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes('YOUR')) { showToast('Payment system offline.', 'error'); return; }
+            const product = currentPageProduct;
+            let handler = PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email: email,
+                amount: Math.round(parseFloat(product.price) * 100),
+                currency: 'ZAR',
+                ref: '' + Math.floor((Math.random() * 1000000000) + 1),
+                metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: product.title }] },
+                callback: async function(response) {
+                    showToast('Payment successful! Generating secure download...', 'success', 6000);
+                    const { data, error } = await supabaseClient.storage.from('products').createSignedUrl(product.file_url, 300);
+                    if (error || !data) { showToast('Error generating link. Contact support.', 'error'); }
+                    else { window.open(data.signedUrl, '_blank'); }
+                },
+                onClose: function() { showToast('Transaction cancelled.', 'info'); }
+            });
+            handler.openIframe();
+        }
 
         async function executePageBuy() {
             const email = document.getElementById('pp-email').value.trim();
