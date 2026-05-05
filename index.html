@@ -1,68 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEXA - Africa's Digital Marketplace</title>
-    
+
     <link rel="icon" type="image/png" href="assets/dexa_logo_final.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <!-- LUCIDE ICONS - pinned stable version -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <!-- LUCIDE ICONS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
 
-    <!-- SUPABASE SDK - pinned stable version via jsDelivr -->
+    <!-- SUPABASE SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
     <!-- PAYSTACK SDK -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
 
-    <!-- DEXA CONFIG (keys live here, gitignored) -->
+    <!-- DEXA CONFIG (keys live here) -->
     <script src="config.js"></script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .app-layout { max-width: 100%; min-height: 100vh; padding-bottom: 80px; }
-        @media (min-width: 768px) {
-            .app-layout { max-width: 1200px; margin: 0 auto; padding-bottom: 0; }
-            .mobile-nav { display: none !important; }
-            .desktop-nav { display: flex !important; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
         }
-        .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; visibility: hidden; transition: 0.3s; }
-        .modal-visible { opacity: 1; visibility: visible; }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .app-layout {
+            max-width: 100%;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        @media (min-width: 768px) {
+            .app-layout {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding-bottom: 0;
+            }
+
+            .mobile-nav {
+                display: none !important;
+            }
+
+            .desktop-nav {
+                display: flex !important;
+            }
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+        }
+
+        .modal-visible {
+            opacity: 1;
+            visibility: visible;
+        }
 
         /* TOAST NOTIFICATIONS */
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { display: flex; align-items: center; gap: 12px; background: #0f172a; color: white; padding: 14px 18px; border-radius: 16px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 32px rgba(0,0,0,0.35); min-width: 260px; max-width: 340px; pointer-events: all; border: 1px solid rgba(255,255,255,0.08); animation: toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-        .toast.removing { animation: toastOut 0.25s ease forwards; }
-        .toast-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
-        .toast.success .toast-icon { background: rgba(16,185,129,0.2); color: #10b981; }
-        .toast.error .toast-icon { background: rgba(239,68,68,0.2); color: #ef4444; }
-        .toast.info .toast-icon { background: rgba(23,125,254,0.2); color: #177DFE; }
-        .toast-close { margin-left: auto; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; padding: 2px; font-size: 16px; line-height: 1; }
-        .toast-close:hover { color: white; }
-        @keyframes toastIn { from { opacity: 0; transform: translateX(40px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
-        @keyframes toastOut { from { opacity: 1; transform: translateX(0) scale(1); } to { opacity: 0; transform: translateX(40px) scale(0.9); } }
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0f172a;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            min-width: 260px;
+            max-width: 340px;
+            pointer-events: all;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: toastIn 0.35s forwards;
+        }
+
+        .toast.removing {
+            animation: toastOut 0.25s forwards;
+        }
+
+        .toast-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .toast.success .toast-icon {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .toast.error .toast-icon {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .toast.info .toast-icon {
+            background: rgba(23, 125, 254, 0.2);
+            color: #177DFE;
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            padding: 2px;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .toast-close:hover {
+            color: white;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(40px) scale(0.9);
+            }
+        }
 
         /* SEARCH & FILTERS */
-        .filter-pill { padding: 8px 18px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #64748b; transition: all 0.2s; white-space: nowrap; }
-        .filter-pill.active { background: #091426; color: white; border-color: #091426; }
-        .filter-pill:hover:not(.active) { border-color: #177DFE; color: #177DFE; }
-        .search-wrapper { position: relative; }
-        .search-wrapper svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 16px; height: 16px; pointer-events: none; }
-        #search-input { padding: 12px 16px 12px 40px; border-radius: 999px; border: 1.5px solid #e2e8f0; font-size: 13px; font-weight: 600; background: white; width: 100%; outline: none; font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color 0.2s; }
-        #search-input:focus { border-color: #177DFE; }
+        .filter-pill {
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
 
-        /* PRODUCT DETAIL MODAL */
-        #product-modal { backdrop-filter: blur(8px); }
-        .product-modal-inner { background: white; border-radius: 32px; width: 92%; max-width: 520px; max-height: 88vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0,0,0,0.4); animation: modalSlideUp 0.35s cubic-bezier(0.34,1.2,0.64,1) forwards; }
-        @keyframes modalSlideUp { from { opacity: 0; transform: translateY(30px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .product-modal-thumb { width: 100%; height: 200px; background: linear-gradient(135deg, #091426 0%, #1a3a5c 100%); border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        .product-modal-thumb::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 70% 30%, rgba(23,125,254,0.3), transparent 60%); }
+        .filter-pill.active {
+            background: #091426;
+            color: white;
+            border-color: #091426;
+        }
 
+        .filter-pill:hover:not(.active) {
+            border-color: #177DFE;
+            color: #177DFE;
+        }
 
-        /* ── PRODUCT PAGE ── */
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-wrapper svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            width: 16px;
+            height: 16px;
+            pointer-events: none;
+        }
+
+        #search-input {
+            padding: 12px 16px 12px 40px;
+            border-radius: 999px;
+            border: 1.5px solid #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            background: white;
+            width: 100%;
+            outline: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        #search-input:focus {
+            border-color: #177DFE;
+        }
+
+        /* PRODUCT PAGE */
         #product-page {
             position: fixed;
             inset: 0;
@@ -70,89 +236,204 @@
             z-index: 80;
             overflow-y: auto;
             transform: translateX(100%);
-            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #product-page.open { transform: translateX(0); }
+
+        #product-page.open {
+            transform: translateX(0);
+        }
+
         .product-page-header {
-            position: sticky; top: 0;
-            background: rgba(248,250,252,0.95);
+            position: sticky;
+            top: 0;
+            background: rgba(248, 250, 252, 0.95);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid #f1f5f9;
             padding: 14px 16px;
-            display: flex; align-items: center; gap: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             z-index: 10;
         }
+
         .back-btn {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: white; border: 1px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
         }
-        .back-btn:hover { background: #f1f5f9; }
+
+        .back-btn:hover {
+            background: #f1f5f9;
+        }
+
         .image-gallery {
-            display: flex; gap: 0;
+            display: flex;
+            gap: 0;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             border-radius: 20px;
             margin: 0 16px;
         }
-        .image-gallery::-webkit-scrollbar { display: none; }
+
+        .image-gallery::-webkit-scrollbar {
+            display: none;
+        }
+
         .gallery-img {
-            flex-shrink: 0; width: 100%; height: auto; aspect-ratio: 16/9; max-height: 480px;
-            object-fit: contain; background-color: #f1f5f9; scroll-snap-align: start;
+            flex-shrink: 0;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+            max-height: 480px;
+            object-fit: contain;
+            background-color: #f1f5f9;
+            scroll-snap-align: start;
             border-radius: 20px;
         }
+
         .gallery-placeholder {
-            flex-shrink: 0; width: 100%; aspect-ratio: 16/9; max-height: 480px;
+            flex-shrink: 0;
+            width: 100%;
+            aspect-ratio: 16/9;
+            max-height: 480px;
             border-radius: 20px;
             background: linear-gradient(135deg, #091426 0%, #1a3a5c 100%);
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
         }
+
         .gallery-placeholder::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle at 70% 30%, rgba(23,125,254,0.3), transparent 60%);
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(23, 125, 254, 0.3), transparent 60%);
             border-radius: 20px;
         }
-        .gallery-dots { display: flex; gap: 6px; justify-content: center; padding: 10px 0; }
-        .gallery-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; transition: all 0.2s; }
-        .gallery-dot.active { background: #177DFE; width: 18px; border-radius: 3px; }
+
+        .gallery-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .gallery-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            transition: all 0.2s;
+        }
+
+        .gallery-dot.active {
+            background: #177DFE;
+            width: 18px;
+            border-radius: 3px;
+        }
+
         .img-preview-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-            gap: 8px; margin-top: 10px;
+            gap: 8px;
+            margin-top: 10px;
         }
+
         .img-preview-item {
-            position: relative; aspect-ratio: 1;
-            border-radius: 10px; overflow: hidden; background: #f1f5f9;
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f1f5f9;
         }
-        .img-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        .img-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .img-preview-remove {
-            position: absolute; top: 3px; right: 3px;
-            width: 18px; height: 18px;
-            background: rgba(0,0,0,0.6); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: white; font-size: 10px; font-weight: bold; border: none;
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 18px;
+            height: 18px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            border: none;
         }
 
+        /* LIVE BILLBOARD */
+        #billboard {
+            transition: all 0.5s ease;
+        }
 
-        /* ── LIVE BILLBOARD ── */
-        #billboard { transition: all 0.5s ease; }
-        .bb-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;cursor:pointer; }
-        .bb-dot.active { background:white;width:18px;border-radius:3px; }
-        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-        #bb-avatar { transition: all 0.5s; }
+        .bb-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .bb-dot.active {
+            background: white;
+            width: 18px;
+            border-radius: 3px;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.4
+            }
+        }
+
+        #bb-avatar {
+            transition: all 0.5s;
+        }
 
         /* CARD HOVER */
-        .product-card { transition: transform 0.2s, box-shadow 0.2s; }
-        .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(9,20,38,0.12); }
-        /* ── MOBILE BOTTOM NAV ── */
+        .product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(9, 20, 38, 0.12);
+        }
+
+        /* MOBILE BOTTOM NAV */
         #mobile-nav {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.97);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.97);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-around;
@@ -160,7 +441,12 @@
             padding: 8px 0 max(8px, env(safe-area-inset-bottom));
             z-index: 60;
         }
-        @media (min-width: 768px) { #mobile-nav { display: none !important; } }
+
+        @media (min-width: 768px) {
+            #mobile-nav {
+                display: none !important;
+            }
+        }
 
         .nav-tab {
             display: flex;
@@ -176,36 +462,65 @@
             color: #94a3b8;
             -webkit-tap-highlight-color: transparent;
         }
+
         .nav-tab span {
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 0.02em;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        .nav-tab svg { width: 22px; height: 22px; transition: all 0.2s; }
-        .nav-tab.active { color: #177DFE; }
-        .nav-tab.active svg { transform: scale(1.1); }
-        .nav-tab:active { transform: scale(0.92); }
 
+        .nav-tab svg {
+            width: 22px;
+            height: 22px;
+            transition: all 0.2s;
+        }
 
-        /* ── LOADING SPINNER ── */
+        .nav-tab.active {
+            color: #177DFE;
+        }
+
+        .nav-tab.active svg {
+            transform: scale(1.1);
+        }
+
+        .nav-tab:active {
+            transform: scale(0.92);
+        }
+
+        /* LOADING SPINNER */
         .dexa-spinner {
             display: inline-block;
-            width: 40px; height: 40px;
-            border: 3px solid rgba(23,125,254,0.15);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(23, 125, 254, 0.15);
             border-top-color: #177DFE;
             border-radius: 50%;
             animation: dexa-spin 0.7s linear infinite;
         }
-        @keyframes dexa-spin { to { transform: rotate(360deg); } }
-        .loading-state {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 60px 20px; gap: 16px;
-        }
-        .loading-state p { color: #94a3b8; font-size: 13px; font-weight: 600; }
 
-        /* ── DEXA MUSIC PLAYER ── */
+        @keyframes dexa-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            gap: 16px;
+        }
+
+        .loading-state p {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* DEXA MUSIC PLAYER */
         #dexa-player {
             position: fixed;
             bottom: 80px;
@@ -213,30 +528,44 @@
             z-index: 200;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
             background: #091426;
-            border: 1px solid rgba(23,125,254,0.3);
-            border-radius: 999px;
-            padding: 10px 16px 10px 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(23,125,254,0.1);
+            border: 1px solid rgba(23, 125, 254, 0.3);
+            border-radius: 50%;
+            width: 54px;
+            height: 54px;
+            padding: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(23, 125, 254, 0.1);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             user-select: none;
         }
+
         @media (min-width: 768px) {
-            #dexa-player { bottom: 24px; right: 24px; }
+            #dexa-player {
+                bottom: 24px;
+                right: 24px;
+            }
         }
+
         @media (max-width: 767px) {
-            #dexa-player { bottom: 76px; right: 12px; }
+            #dexa-player {
+                bottom: 76px;
+                right: 12px;
+            }
         }
+
         #dexa-player:hover {
             transform: scale(1.05);
-            border-color: rgba(23,125,254,0.6);
-            box-shadow: 0 12px 40px rgba(23,125,254,0.25);
+            border-color: rgba(23, 125, 254, 0.6);
+            box-shadow: 0 12px 40px rgba(23, 125, 254, 0.25);
         }
-        #dexa-player.muted { border-color: rgba(255,255,255,0.1); opacity: 0.7; }
 
-        /* Vinyl disc */
+        #dexa-player.muted {
+            border-color: rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+        }
+
         .dexa-disc {
             width: 32px;
             height: 32px;
@@ -249,80 +578,68 @@
             animation: spin 4s linear infinite;
             position: relative;
         }
+
         .dexa-disc::after {
             content: '';
             width: 10px;
             height: 10px;
             background: #091426;
             border-radius: 50%;
-            border: 2px solid rgba(23,125,254,0.5);
-        }
-        .dexa-disc.paused { animation-play-state: paused; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* Sound bars */
-        .dexa-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
-            height: 16px;
-        }
-        .dexa-bars span {
-            display: block;
-            width: 3px;
-            background: #177DFE;
-            border-radius: 2px;
-            animation: bar-bounce 0.8s ease-in-out infinite alternate;
-        }
-        .dexa-bars span:nth-child(1) { height: 6px;  animation-delay: 0s;    }
-        .dexa-bars span:nth-child(2) { height: 12px; animation-delay: 0.15s; }
-        .dexa-bars span:nth-child(3) { height: 8px;  animation-delay: 0.3s;  }
-        .dexa-bars span:nth-child(4) { height: 14px; animation-delay: 0.1s;  }
-        .dexa-bars span:nth-child(5) { height: 5px;  animation-delay: 0.25s; }
-        .dexa-bars.paused span { animation-play-state: paused; opacity: 0.3; }
-        @keyframes bar-bounce {
-            from { transform: scaleY(0.4); }
-            to   { transform: scaleY(1.2); }
+            border: 2px solid rgba(23, 125, 254, 0.5);
         }
 
-        .dexa-track-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .dexa-track-name { font-size: 11px; font-weight: 700; color: white; letter-spacing: 0.02em; }
-        .dexa-track-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; text-transform: uppercase; }
+        .dexa-disc.paused {
+            animation-play-state: paused;
+        }
 
-        .dexa-mute-icon { color: rgba(255,255,255,0.4); flex-shrink: 0; transition: color 0.2s; }
-        #dexa-player:hover .dexa-mute-icon { color: white; }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
 
-        /* Intro fade-in */
-        #dexa-player { animation: playerSlideIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 1.5s both; }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #dexa-player {
+            animation: playerSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s both;
+        }
+
         @keyframes playerSlideIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.8); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
 
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
     </style>
 </head>
+
 <body class="text-slate-900">
 
     <div class="app-layout">
-        
         <!-- HEADER -->
-        <header class="bg-white sticky top-0 z-20 border-b border-slate-100 px-4 md:px-8 py-4 flex justify-between items-center shadow-sm">
+        <header
+            class="bg-white sticky top-0 z-20 border-b border-slate-100 px-4 md:px-8 py-4 flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3">
                 <img src="assets/dexa_logo_final.png" class="h-8 md:h-10">
                 <span class="text-xl md:text-2xl font-black tracking-tighter">DEXA</span>
             </div>
-
-            <!-- Desktop Nav -->
             <div class="desktop-nav hidden items-center gap-6">
-                <button onclick="switchView('buyer')" class="text-sm font-bold text-slate-600 hover:text-[#177DFE]">Marketplace</button>
+                <button onclick="switchView('buyer')"
+                    class="text-sm font-bold text-slate-600 hover:text-[#177DFE]">Marketplace</button>
                 <div id="auth-buttons-desktop" class="flex gap-4"></div>
             </div>
-
-            <!-- Mobile Toggle -->
             <div class="md:hidden" onclick="toggleAppMode()">
                 <div class="bg-slate-100 p-2 rounded-full flex items-center gap-2">
                     <span id="mode-text" class="text-[10px] font-bold uppercase text-slate-500 pl-1">Buyer</span>
-                    <div id="mode-indicator" class="w-6 h-6 rounded-full bg-[#177DFE] flex items-center justify-center text-white">
+                    <div id="mode-indicator"
+                        class="w-6 h-6 rounded-full bg-[#177DFE] flex items-center justify-center text-white">
                         <i data-lucide="shopping-bag" class="w-3 h-3"></i>
                     </div>
                 </div>
@@ -331,50 +648,55 @@
 
         <!-- BUYER VIEW -->
         <div id="buyer-view" class="fade-in p-4 md:p-8 pb-24 md:pb-8">
-            <!-- ── LIVE BILLBOARD ── -->
-            <div id="billboard" class="relative overflow-hidden rounded-[32px] bg-[#091426] text-white shadow-2xl mb-8" style="min-height:auto;">
-                <!-- Background glow -->
-                <div id="bb-glow" style="position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(23,125,254,0.18),transparent 65%);pointer-events:none;transition:background 1s;"></div>
-
-                <!-- Content — compact on mobile, spacious on desktop -->
+            <!-- LIVE BILLBOARD -->
+            <div id="billboard" class="relative overflow-hidden rounded-[32px] bg-[#091426] text-white shadow-2xl mb-8"
+                style="min-height:auto;">
+                <div id="bb-glow"
+                    style="position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(23,125,254,0.18),transparent 65%);pointer-events:none;transition:background 1s;">
+                </div>
                 <div class="relative z-10 p-5 md:p-10 flex flex-row md:flex-row items-center justify-between gap-4">
                     <div class="flex-1 min-w-0">
-                        <!-- Header row -->
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="bg-red-500 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                <span style="width:4px;height:4px;background:white;border-radius:50%;display:inline-block;animation:pulse 1.2s infinite;"></span>
+                            <span
+                                class="bg-red-500 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                <span
+                                    style="width:4px;height:4px;background:white;border-radius:50%;display:inline-block;animation:pulse 1.2s infinite;"></span>
                                 Live Billboard
                             </span>
-                            <span id="bb-timer" class="text-[9px] font-bold text-slate-400 tracking-widest hidden md:inline"></span>
+                            <span id="bb-timer"
+                                class="text-[9px] font-bold text-slate-400 tracking-widest hidden md:inline"></span>
                         </div>
-
-                        <!-- Seller info -->
                         <div class="flex items-center gap-2 mb-2">
-                            <div id="bb-avatar" style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#177DFE,#0a4a99);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;"></div>
+                            <div id="bb-avatar"
+                                style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#177DFE,#0a4a99);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;">
+                            </div>
                             <div class="min-w-0">
                                 <p id="bb-shop" class="font-black text-sm text-white leading-tight truncate"></p>
                                 <p id="bb-tagline" class="text-slate-400 text-[10px] font-semibold"></p>
                             </div>
                         </div>
-
-                        <!-- Featured product -->
                         <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest mb-1">Featured</p>
                         <p id="bb-product" class="font-black text-base text-white mb-1 leading-snug truncate"></p>
                         <p id="bb-price" class="text-[#177DFE] font-black text-sm mb-3"></p>
-
-                        <button id="bb-explore-btn" class="bg-white text-[#091426] px-4 py-2 rounded-xl font-bold text-xs hover:scale-105 transition-transform flex items-center gap-1.5">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <button id="bb-explore-btn"
+                            class="bg-white text-[#091426] px-4 py-2 rounded-xl font-bold text-xs hover:scale-105 transition-transform flex items-center gap-1.5">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                            </svg>
                             Explore Product
                         </button>
                     </div>
-
-                    <!-- Product thumbnail — smaller on mobile -->
-                    <div id="bb-thumb" style="width:100px;height:100px;border-radius:16px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#0f1f3d,#1a3a5c);display:flex;align-items:center;justify-content:center;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <div id="bb-thumb"
+                        style="width:100px;height:100px;border-radius:16px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#0f1f3d,#1a3a5c);display:flex;align-items:center;justify-content:center;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)"
+                            stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                        </svg>
                     </div>
                 </div>
-
-                <!-- Dots row -->
                 <div class="relative z-10 px-5 md:px-10 pb-4 flex items-center justify-between">
                     <span id="bb-timer-mobile" class="text-[9px] font-bold text-slate-500 md:hidden"></span>
                     <div class="flex gap-1.5 ml-auto" id="bb-dots"></div>
@@ -384,15 +706,23 @@
             <!-- SEARCH + FILTERS -->
             <div class="mb-6 flex flex-col gap-4">
                 <div class="search-wrapper">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input id="search-input" type="search" placeholder="Search products..." oninput="this.dataset.userTyped='1';filterProducts()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="dexa-search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input id="search-input" type="search" placeholder="Search products..."
+                        oninput="this.dataset.userTyped='1';filterProducts()" autocomplete="off" autocorrect="off"
+                        autocapitalize="off" spellcheck="false">
                 </div>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
                     <button class="filter-pill active" data-cat="all" onclick="setCategory(this, 'all')">All</button>
-                    <button class="filter-pill" data-cat="templates" onclick="setCategory(this, 'templates')">Templates</button>
+                    <button class="filter-pill" data-cat="templates"
+                        onclick="setCategory(this, 'templates')">Templates</button>
                     <button class="filter-pill" data-cat="saas" onclick="setCategory(this, 'saas')">SaaS Kits</button>
                     <button class="filter-pill" data-cat="audio" onclick="setCategory(this, 'audio')">Audio</button>
-                    <button class="filter-pill" data-cat="design" onclick="setCategory(this, 'design')">Design Assets</button>
+                    <button class="filter-pill" data-cat="design" onclick="setCategory(this, 'design')">Design
+                        Assets</button>
                     <button class="filter-pill" data-cat="ebooks" onclick="setCategory(this, 'ebooks')">eBooks</button>
                     <button class="filter-pill" data-cat="other" onclick="setCategory(this, 'other')">Other</button>
                 </div>
@@ -404,7 +734,8 @@
             </div>
 
             <!-- Marketplace Footer -->
-            <footer style="margin-top:64px;background:#07090f;border-radius:24px;padding:40px 32px 28px;margin-left:-16px;margin-right:-16px;">
+            <footer
+                style="margin-top:64px;background:#07090f;border-radius:24px;padding:40px 32px 28px;margin-left:-16px;margin-right:-16px;">
                 <div class="text-center mb-8">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <img src="assets/dexa_logo_final.png" style="height:28px;filter:invert(1);opacity:0.9;">
@@ -412,29 +743,29 @@
                     </div>
                     <p style="font-size:11px;color:#4a5568;">Africa's Digital Marketplace · Built in 🇿🇦</p>
                 </div>
-
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
                     <div>
-                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Company</p>
-                        <p style="font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:4px;">Ratio Capital Holdings (Pty) Ltd</p>
-                        <p style="font-size:11px;color:#4a5568;">Reg. No: 2026/217968/07</p>
+                        <p
+                            style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;margin-bottom:12px;">
+                            Company</p>
+                        <p style="font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:4px;">Ratio Capital
+                            Holdings</p>
                     </div>
                     <div>
-                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Legal</p>
-                        <a href="https://www.dexamarket.co.za/#privacy" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Privacy Policy</a>
-                        <a href="https://www.dexamarket.co.za/terms.html" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Terms & Conditions</a>
-                        <p style="font-size:11px;color:#4a5568;">POPIA Compliant</p>
+                        <p
+                            style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;margin-bottom:12px;">
+                            Legal</p>
+                        <p style="font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;">Privacy Policy</p>
                     </div>
-                    <div class="col-span-2 md:col-span-1">
-                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Support</p>
-                        <a href="mailto:support@dexamarket.co.za" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">support@dexamarket.co.za</a>
-                        <a href="https://www.dexamarket.co.za" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">dexamarket.co.za</a>
+                    <div>
+                        <p
+                            style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;margin-bottom:12px;">
+                            Support</p>
+                        <p style="font-size:12px;font-weight:600;color:#8892a4;">support@dexamarket.co.za</p>
                     </div>
                 </div>
-
                 <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;text-align:center;">
-                    <p style="font-size:11px;color:#2d3748;">© 2026 DEXA · Ratio Capital Holdings (Pty) Ltd · All rights reserved.</p>
-                    <p style="font-size:11px;color:#2d3748;margin-top:4px;">Payments secured by Paystack · Files delivered via Supabase Encrypted Storage</p>
+                    <p style="font-size:11px;color:#2d3748;">© 2026 DEXA · All rights reserved.</p>
                 </div>
             </footer>
         </div>
@@ -444,29 +775,31 @@
             <div class="max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-3xl font-black text-[#091426]">Seller Hub</h2>
-                    <span id="seller-shop-name" class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full"></span>
+                    <span id="seller-shop-name"
+                        class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full"></span>
                 </div>
-
                 <div class="grid lg:grid-cols-3 gap-8">
-                    <!-- Stats -->
                     <div class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm h-fit">
                         <div class="flex items-center gap-3 mb-6 text-slate-400">
                             <i data-lucide="wallet" class="w-6 h-6"></i>
                             <span class="text-xs font-bold uppercase tracking-widest">Balance</span>
                         </div>
                         <h3 class="text-4xl font-black text-[#091426] mb-2">R 0.00</h3>
-                        <button class="w-full bg-[#177DFE] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Withdraw Funds</button>
+                        <button
+                            class="w-full bg-[#177DFE] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Withdraw
+                            Funds</button>
                     </div>
-
-                    <!-- Upload Form -->
                     <div class="lg:col-span-2 bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
                         <h3 class="font-bold text-lg mb-6">Upload Product</h3>
                         <form id="upload-form" onsubmit="handleUpload(event)" class="space-y-4">
                             <div class="grid md:grid-cols-2 gap-4">
-                                <input type="text" id="prod-title" placeholder="Product Title" class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
-                                <input type="number" id="prod-price" placeholder="Price (ZAR)" class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
+                                <input type="text" id="prod-title" placeholder="Product Title" required
+                                    class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
+                                <input type="number" id="prod-price" placeholder="Price (ZAR)" required
+                                    class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
                             </div>
-                            <select id="prod-category" class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE] text-slate-600">
+                            <select id="prod-category" required
+                                class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE] text-slate-600">
                                 <option value="" disabled selected>Select a Category</option>
                                 <option value="templates">Templates</option>
                                 <option value="saas">SaaS Starter Kits</option>
@@ -475,28 +808,33 @@
                                 <option value="audio">Audio</option>
                                 <option value="other">Other</option>
                             </select>
-                            <textarea id="prod-desc" rows="3" placeholder="Describe your product (What makes it special?)" class="w-full bg-slate-50 p-4 rounded-xl font-medium text-sm border-none focus:ring-2 focus:ring-[#177DFE]"></textarea>
+                            <textarea id="prod-desc" rows="3" placeholder="Describe your product"
+                                class="w-full bg-slate-50 p-4 rounded-xl font-medium text-sm border-none focus:ring-2 focus:ring-[#177DFE]"></textarea>
                             <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Cover Images (Up to 5)</p>
-                                <div class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center bg-slate-50">
-                                    <input type="file" id="cover-uploader" accept="image/*" multiple onchange="previewImages(this)" />
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Cover Images
+                                    (Up to 5)</p>
+                                <div
+                                    class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center bg-slate-50">
+                                    <input type="file" id="cover-uploader" accept="image/*" multiple
+                                        onchange="previewImages(this)" />
                                     <div id="img-preview-grid" class="img-preview-grid w-full"></div>
                                 </div>
                             </div>
                             <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Product File</p>
-                                <div class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex justify-center bg-slate-50">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Product File
+                                </p>
+                                <div
+                                    class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex justify-center bg-slate-50">
                                     <input type="file" id="file-uploader" required />
                                 </div>
                             </div>
-                            <button id="upload-btn" class="w-full bg-[#091426] text-white py-4 rounded-xl font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
-                                <i data-lucide="upload" style="width:16px;height:16px;"></i>
-                                Publish Product
+                            <button id="upload-btn"
+                                class="w-full bg-[#091426] text-white py-4 rounded-xl font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="upload" style="width:16px;height:16px;"></i> Publish Product
                             </button>
                         </form>
                     </div>
                 </div>
-
                 <div class="mt-12">
                     <h3 class="font-bold text-xl mb-6">Your Listings</h3>
                     <div id="seller-list" class="space-y-3">
@@ -506,45 +844,61 @@
             </div>
         </div>
 
-        <!-- MOBILE BOTTOM NAV — context-aware -->
+        <!-- MOBILE NAV -->
         <nav id="mobile-nav">
-            <!-- BUYER NAV (default) -->
             <div id="buyer-nav-tabs" class="contents">
                 <button class="nav-tab active" id="tab-home" onclick="navTo('home')">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
                     <span>Home</span>
                 </button>
                 <button class="nav-tab" id="tab-search" onclick="navTo('search')">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
                     <span>Search</span>
                 </button>
-                <button class="nav-tab" id="tab-purchases" onclick="navTo('purchases')">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    <span>Purchases</span>
-                </button>
                 <button class="nav-tab" id="tab-profile" onclick="navTo('profile')">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
                     <span>Profile</span>
                 </button>
             </div>
-
-            <!-- SELLER NAV (shown when logged in as seller) -->
             <div id="seller-nav-tabs" class="contents hidden">
                 <button class="nav-tab" id="stab-home" onclick="switchView('buyer'); setActiveTab('stab-home')">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
                     <span>Home</span>
                 </button>
-                <button class="nav-tab active" id="stab-upload" onclick="switchView('seller'); setActiveTab('stab-upload')">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <button class="nav-tab active" id="stab-upload"
+                    onclick="switchView('seller'); setActiveTab('stab-upload')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
                     <span>Upload</span>
                 </button>
-                <button class="nav-tab" id="stab-store" onclick="switchView('seller'); setActiveTab('stab-store'); setTimeout(()=>{ const el=document.getElementById('seller-list'); if(el) el.scrollIntoView({behavior:'smooth'}); }, 300);">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><rect x="2" y="7" width="20" height="5"/></svg>
+                <button class="nav-tab" id="stab-store" onclick="switchView('seller'); setActiveTab('stab-store')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <path d="M9 22V12h6v10" />
+                        <rect x="2" y="7" width="20" height="5" />
+                    </svg>
                     <span>My Store</span>
-                </button>
-                <button class="nav-tab" id="stab-profile" onclick="navTo('profile'); setActiveTab('stab-profile')">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span>Profile</span>
                 </button>
             </div>
         </nav>
@@ -553,21 +907,28 @@
     <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
 
-    <!-- ── PRODUCT DETAIL PAGE ── -->
-   <div class="product-page-header">
+    <!-- PRODUCT DETAIL PAGE -->
+    <div id="product-page">
+        <div class="product-page-header">
             <button class="back-btn" onclick="closeProductPage()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 5l-7 7 7 7" />
+                </svg>
             </button>
-            
-            <!-- Added flex-1 to push the share button to the right edge -->
             <span id="pp-breadcrumb" class="text-sm font-bold text-slate-400 truncate flex-1"></span>
-            
-            <!-- NEW SHARE BUTTON -->
+
+            <!-- SHARE BUTTON -->
             <button class="back-btn" onclick="shareProduct()" title="Share Product">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
             </button>
-        </div>
-            <span id="pp-breadcrumb" class="text-sm font-bold text-slate-400 truncate"></span>
         </div>
         <div class="pt-4 pb-0">
             <div class="image-gallery" id="pp-gallery"></div>
@@ -581,7 +942,7 @@
             <p id="pp-seller" class="text-xs font-bold text-[#177DFE] mb-5"></p>
             <div class="bg-slate-50 rounded-2xl p-4 mb-5">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">About this product</p>
-                <p id="pp-desc" class="text-sm text-slate-600 leading-relaxed"></p>
+                <p id="pp-desc" class="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap"></p>
             </div>
             <div class="flex gap-3 mb-5">
                 <div class="flex-1 bg-emerald-50 rounded-2xl p-4 text-center">
@@ -595,89 +956,57 @@
             </div>
             <input type="email" id="pp-email" placeholder="Your email for receipt & download"
                 class="w-full bg-slate-50 p-4 rounded-xl font-semibold text-sm mb-3 outline-none focus:ring-2 focus:ring-[#177DFE] border border-transparent focus:border-[#177DFE]">
-            <button id="pp-buy-btn" class="w-full bg-[#091426] text-white py-4 rounded-xl font-black text-base hover:bg-[#177DFE] transition-colors flex items-center justify-center gap-2 mb-8">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <button id="pp-buy-btn"
+                class="w-full bg-[#091426] text-white py-4 rounded-xl font-black text-base hover:bg-[#177DFE] transition-colors flex items-center justify-center gap-2 mb-8">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
                 Buy Now — <span id="pp-price-btn"></span>
             </button>
-        
-            <!-- Product page footer -->
-            <div class="border-t border-slate-100 mx-5 pt-6 pb-8 text-center">
-                <p class="text-xs text-slate-300">Sold securely on <span class="font-bold text-slate-400">DEXA</span> · Africa's Digital Marketplace</p>
-                <p class="text-xs text-slate-300 mt-1">Instant encrypted delivery · POPIA Compliant · Paystack secured</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- PRODUCT DETAIL MODAL -->
-    <div id="product-modal" class="modal-backdrop" onclick="closeProductModal(event)">
-        <div class="product-modal-inner" id="product-modal-inner">
-            <div class="product-modal-thumb" id="pm-thumb">
-                <i data-lucide="package" style="width:56px;height:56px;color:rgba(255,255,255,0.3);position:relative;z-index:1;"></i>
-            </div>
-            <div class="p-7">
-                <div class="flex justify-between items-start mb-1">
-                    <h2 id="pm-title" class="text-2xl font-black text-[#091426] leading-tight pr-4"></h2>
-                    <button onclick="document.getElementById('product-modal').classList.remove('modal-visible')" class="text-slate-300 hover:text-slate-600 mt-1 flex-shrink-0">
-                        <i data-lucide="x" style="width:20px;height:20px;"></i>
-                    </button>
-                </div>
-                <p id="pm-seller" class="text-xs font-bold text-[#177DFE] mb-4"></p>
-                <p id="pm-desc" class="text-sm text-slate-500 leading-relaxed mb-6"></p>
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-5">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Price</p>
-                        <p id="pm-price" class="text-3xl font-black text-[#091426]"></p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Instant Download</p>
-                        <p class="text-sm font-bold text-emerald-600">✓ After Payment</p>
-                    </div>
-                </div>
-                <input type="email" id="pm-email" placeholder="Your email for receipt & download" 
-                    class="w-full bg-slate-50 p-4 rounded-xl font-semibold text-sm mb-3 outline-none focus:ring-2 focus:ring-[#177DFE] border border-transparent focus:border-[#177DFE]">
-                <button id="pm-buy-btn" class="w-full bg-[#091426] text-white py-4 rounded-xl font-black text-sm hover:bg-[#177DFE] transition-colors flex items-center justify-center gap-2">
-                    <i data-lucide="zap" style="width:16px;height:16px;"></i>
-                    Buy Now
-                </button>
-            </div>
         </div>
     </div>
 
     <!-- AUTH MODAL -->
     <div id="auth-modal" class="modal-backdrop">
         <div class="bg-white p-8 rounded-[32px] w-[90%] max-w-sm relative shadow-2xl overflow-y-auto max-h-[90vh]">
-            <button onclick="toggleModal()" class="absolute top-4 right-4 text-slate-400"><i data-lucide="x"></i></button>
+            <button onclick="toggleModal()" class="absolute top-4 right-4 text-slate-400"><i
+                    data-lucide="x"></i></button>
             <h2 id="modal-title" class="text-2xl font-black text-center mb-6">Login</h2>
-            
+
             <div id="signup-fields" class="hidden">
-                <input type="text" id="full-name" placeholder="Full Name" class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
-                <input type="tel" id="phone" placeholder="Phone Number" class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
-                <input type="text" id="shop-name" placeholder="Shop Name (e.g. Zulu Designs)" class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
+                <input type="text" id="full-name" placeholder="Full Name"
+                    class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
+                <input type="tel" id="phone" placeholder="Phone Number"
+                    class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
+                <input type="text" id="shop-name" placeholder="Shop Name (e.g. Zulu Designs)"
+                    class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
             </div>
-            
-            <input type="email" id="email" placeholder="Email" class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
-            <input type="password" id="password" placeholder="Password" class="w-full bg-slate-50 p-4 rounded-xl mb-6 font-bold text-sm">
-            
-            <button id="main-auth-btn" onclick="handleLogin()" class="w-full bg-[#091426] text-white py-3 rounded-xl font-bold text-sm mb-3">Login</button>
-            
+
+            <input type="email" id="email" placeholder="Email"
+                class="w-full bg-slate-50 p-4 rounded-xl mb-3 font-bold text-sm">
+            <input type="password" id="password" placeholder="Password"
+                class="w-full bg-slate-50 p-4 rounded-xl mb-6 font-bold text-sm">
+
+            <button id="main-auth-btn" onclick="handleLogin()"
+                class="w-full bg-[#091426] text-white py-3 rounded-xl font-bold text-sm mb-3">Login</button>
+
             <p class="text-xs text-center text-slate-400">
-                <span id="auth-switch-text">Don't have a shop?</span> 
-                <button onclick="toggleAuthMode()" id="auth-switch-btn" class="text-[#177DFE] font-bold hover:underline">Create One</button>
+                <span id="auth-switch-text">Don't have a shop?</span>
+                <button onclick="toggleAuthMode()" id="auth-switch-btn"
+                    class="text-[#177DFE] font-bold hover:underline">Create One</button>
             </p>
         </div>
     </div>
 
+    <!-- JAVASCRIPT -->
     <script>
-        // ─── TOAST SYSTEM ────────────────────────────────────────────────────────
         function showToast(message, type = 'info', duration = 4000) {
             const container = document.getElementById('toast-container');
             const icons = { success: '✓', error: '✕', info: 'ℹ' };
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <div class="toast-icon">${icons[type]}</div>
-                <span style="flex:1">${message}</span>
-                <button class="toast-close" onclick="removeToast(this.parentElement)">✕</button>`;
+            toast.innerHTML = `<div class="toast-icon">${icons[type]}</div><span style="flex:1">${message}</span><button class="toast-close" onclick="removeToast(this.parentElement)">✕</button>`;
             container.appendChild(toast);
             setTimeout(() => removeToast(toast), duration);
         }
@@ -687,85 +1016,26 @@
             setTimeout(() => toast.remove(), 250);
         }
 
-        // ─── PRODUCT DETAIL MODAL ────────────────────────────────────────────────
-        let currentProduct = null;
-        function openProductModal(product) {
-            currentProduct = product;
-            const thumb = document.getElementById('pm-thumb');
-            if (product.cover_image) {
-                thumb.style.background = 'none';
-                thumb.innerHTML = `<img src="${product.cover_image}" style="width:100%;height:100%;object-fit:cover;border-radius:24px 24px 0 0;" alt="${product.title}">`;
-            } else {
-                thumb.style.background = '';
-                thumb.innerHTML = `<i data-lucide="package" style="width:56px;height:56px;color:rgba(255,255,255,0.3);position:relative;z-index:1;"></i>`;
-            }
-            document.getElementById('pm-title').textContent = product.title;
-            document.getElementById('pm-seller').textContent = '@ ' + (product.seller_email || 'Verified Seller');
-            document.getElementById('pm-desc').textContent = product.description || 'No description provided.';
-            document.getElementById('pm-price').textContent = 'R' + parseFloat(product.price).toFixed(2);
-            document.getElementById('pm-email').value = '';
-            document.getElementById('pm-buy-btn').onclick = () => executeBuy();
-            document.getElementById('product-modal').classList.add('modal-visible');
-            if (typeof lucide !== "undefined") lucide.createIcons();
-        }
-        function closeProductModal(e) {
-            if (e.target === document.getElementById('product-modal')) {
-                document.getElementById('product-modal').classList.remove('modal-visible');
-            }
-        }
-        function executeBuy() {
-            const email = document.getElementById('pm-email').value.trim();
-            if (!email || !email.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
-            if (!currentProduct) return;
-            if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes('YOUR')) {
-                showToast('Payment system is offline.', 'error'); return;
-            }
-            document.getElementById('product-modal').classList.remove('modal-visible');
-            let handler = PaystackPop.setup({
-                key: PAYSTACK_PUBLIC_KEY,
-                email: email,
-                amount: currentProduct.price * 100,
-                currency: 'ZAR',
-                ref: '' + Math.floor((Math.random() * 1000000000) + 1),
-                metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: currentProduct.title }] },
-                callback: async function(response) {
-                    showToast('Payment successful! Generating secure link...', 'success', 6000);
-                    const { data, error } = await supabaseClient.storage.from('products').createSignedUrl(currentProduct.file_url, 60);
-                    if (error || !data) {
-                        showToast('Error generating download link. Please contact support.', 'error');
-                    } else {
-                        window.open(data.signedUrl, '_blank');
-                    }
-                },
-                onClose: function() { showToast('Transaction cancelled.', 'info'); }
-            });
-            handler.openIframe();
-        }
-
-        // ─── SEARCH & FILTER ─────────────────────────────────────────────────────
         let allProducts = [];
         let activeCategory = 'all';
+
         function setCategory(el, cat) {
             document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
             activeCategory = cat;
             filterProducts();
         }
+
         function filterProducts() {
             const query = document.getElementById('search-input').value.toLowerCase().trim();
             let filtered = allProducts;
-            if (activeCategory !== 'all') {
-                filtered = filtered.filter(p => (p.category || 'other') === activeCategory);
-            }
+            if (activeCategory !== 'all') filtered = filtered.filter(p => (p.category || 'other') === activeCategory);
             if (query) {
-                filtered = filtered.filter(p =>
-                    p.title.toLowerCase().includes(query) ||
-                    (p.description || '').toLowerCase().includes(query) ||
-                    (p.seller_email || '').toLowerCase().includes(query)
-                );
+                filtered = filtered.filter(p => p.title.toLowerCase().includes(query) || (p.description || '').toLowerCase().includes(query));
             }
             renderProductGrid(filtered);
         }
+
         function renderProductGrid(products) {
             const grid = document.getElementById('public-product-grid');
             grid.innerHTML = '';
@@ -774,40 +1044,40 @@
                 return;
             }
             products.forEach(d => {
-                const creator = d.seller_email || 'Verified Seller';
-                const description = d.description || 'Digital Product';
-                const displayDesc = description.length > 50 ? description.substring(0, 50) + '...' : description;
+                const displayDesc = d.description && d.description.length > 50 ? d.description.substring(0, 50) + '...' : (d.description || 'Digital Product');
                 const hues = ['135deg, #091426, #1a3a5c', '135deg, #0f172a, #1e3a5f', '135deg, #1a1a2e, #16213e', '135deg, #0d1b2a, #1b4332'];
                 const hue = hues[Math.abs(d.title.charCodeAt(0) || 0) % hues.length];
-                grid.innerHTML += `
-                <div class="product-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer" onclick='openProductPage(${JSON.stringify(d).replace(/'/g, "&#39;")})'>
+                // Note: We avoid JSON.stringify directly in the HTML string to prevent quote breakage
+
+                const card = document.createElement('div');
+                card.className = "product-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer";
+                card.onclick = () => openProductPage(d);
+
+                let imgHtml = d.cover_image
+                    ? `<img src="${d.cover_image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px 16px 0 0;" alt="cover">`
+                    : `<div style="position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(23,125,254,0.25),transparent 60%);"></div><i data-lucide="package" style="width:36px;height:36px;color:rgba(255,255,255,0.25);position:relative;z-index:1;"></i>`;
+
+                card.innerHTML = `
                     <div style="aspect-ratio: 16/9; width: 100%; background:linear-gradient(${hue});display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:16px 16px 0 0;">
-                        ${d.cover_image
-                            ? `<img src="${d.cover_image}" style="width:100%;height:100%;object-fit:cover;border-radius:16px 16px 0 0;" alt="${d.title}">`
-                            : `<div style="position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(23,125,254,0.25),transparent 60%);"></div><i data-lucide="package" style="width:36px;height:36px;color:rgba(255,255,255,0.25);position:relative;z-index:1;"></i>`
-                        }
+                        ${imgHtml}
                     </div>
                     <div class="p-4">
-                        <h4 class="font-bold text-sm text-[#091426] mb-1" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.title}</h4>
-                        <p class="text-xs text-slate-400 mb-3" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${displayDesc}</p>
+                        <h4 class="font-bold text-sm text-[#091426] mb-1 truncate">${d.title}</h4>
+                        <p class="text-xs text-slate-400 mb-3 truncate">${displayDesc}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-sm font-black text-[#091426]">R${parseFloat(d.price).toFixed(2)}</span>
-                            <button class="bg-[#091426] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#177DFE] transition-colors flex items-center gap-1">
-                                <i data-lucide="zap" style="width:11px;height:11px;"></i> Buy
-                            </button>
+                            <button class="bg-[#091426] text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1"><i data-lucide="zap" style="width:11px;height:11px;"></i> Buy</button>
                         </div>
                     </div>
-                </div>`;
+                `;
+                grid.appendChild(card);
             });
             if (typeof lucide !== "undefined") lucide.createIcons();
         }
 
-        // CONFIG
-        // Keys loaded from config.js (gitignored)
-        var SUPABASE_URL        = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.SUPABASE_URL        : '';
-        var SUPABASE_KEY        = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.SUPABASE_KEY        : '';
+        var SUPABASE_URL = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.SUPABASE_URL : '';
+        var SUPABASE_KEY = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.SUPABASE_KEY : '';
         var PAYSTACK_PUBLIC_KEY = (typeof DEXA_CONFIG !== 'undefined') ? DEXA_CONFIG.PAYSTACK_PUBLIC_KEY : '';
-
         var supabaseClient = null;
         var isSupabaseReady = false;
         var isLoginMode = true;
@@ -822,59 +1092,49 @@
                 checkUser();
                 loadPublicMarket();
                 loadBillboard();
-                checkUrlForProduct(); // <-- NEW: Check URL for direct links
+                checkUrlForProduct();
                 if (typeof lucide !== 'undefined') lucide.createIcons();
-            } catch(e) {
-                console.warn('Supabase not ready, retrying in 300ms...', e.message);
+            } catch (e) {
                 setTimeout(initSupabase, 300);
             }
         }
 
-        // NEW: Fetch product if linked directly
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSupabase);
+        else initSupabase();
+
         async function checkUrlForProduct() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('p');
             if (productId) {
                 const { data, error } = await supabaseClient.from('products').select('*').eq('id', productId).single();
                 if (data && !error) {
-                    openProductPage(data, true); // true = skip pushing to history to avoid loops
+                    openProductPage(data, true);
                 } else {
-                    showToast('Product not found or removed.', 'error');
-                    window.history.replaceState({}, '', window.location.pathname);
+                    showToast('Product not found.', 'error');
+                    try { window.history.replaceState({}, '', window.location.pathname); } catch (e) { }
                 }
             }
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initSupabase);
-        } else {
-            initSupabase();
-        }
-
-        // VIEW & AUTH
         function switchView(view) {
             const buyer = document.getElementById('buyer-view');
             const seller = document.getElementById('seller-view');
             if (view === 'buyer') {
-                buyer.classList.remove('hidden');
-                seller.classList.add('hidden');
+                buyer.classList.remove('hidden'); seller.classList.add('hidden');
                 document.getElementById('mode-text').innerText = 'Buyer';
-                showBuyerNav();
-                setActiveTab('tab-home');
-                loadPublicMarket();
+                document.getElementById('buyer-nav-tabs').classList.remove('hidden');
+                document.getElementById('seller-nav-tabs').classList.add('hidden');
+                setActiveTab('tab-home'); loadPublicMarket();
             } else {
-                if (!isSupabaseReady) { showToast('System not ready', 'error'); return; }
+                if (!isSupabaseReady) return showToast('System not ready', 'error');
                 supabaseClient.auth.getUser().then(({ data: { user } }) => {
                     if (user) {
-                        buyer.classList.add('hidden');
-                        seller.classList.remove('hidden');
+                        buyer.classList.add('hidden'); seller.classList.remove('hidden');
                         document.getElementById('mode-text').innerText = 'Seller';
-                        showSellerNav();
-                        setActiveTab('stab-upload');
-                        checkUser();
-                    } else {
-                        toggleModal();
-                    }
+                        document.getElementById('buyer-nav-tabs').classList.add('hidden');
+                        document.getElementById('seller-nav-tabs').classList.remove('hidden');
+                        setActiveTab('stab-upload'); checkUser();
+                    } else toggleModal();
                 });
             }
         }
@@ -884,404 +1144,213 @@
             switchView(isSeller ? 'buyer' : 'seller');
         }
 
-        function toggleModal() { 
+        function toggleModal() {
             document.getElementById('auth-modal').classList.toggle('modal-visible');
-            if(document.getElementById('auth-modal').classList.contains('modal-visible')) {
-                isLoginMode = true;
-                updateAuthModalUI();
+            if (document.getElementById('auth-modal').classList.contains('modal-visible')) {
+                isLoginMode = true; updateAuthModalUI();
             }
         }
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            updateAuthModalUI();
-        }
+        function toggleAuthMode() { isLoginMode = !isLoginMode; updateAuthModalUI(); }
 
         function updateAuthModalUI() {
             const signupFields = document.getElementById('signup-fields');
             const title = document.getElementById('modal-title');
             const mainBtn = document.getElementById('main-auth-btn');
-            const switchText = document.getElementById('auth-switch-text');
             const switchBtn = document.getElementById('auth-switch-btn');
-
             if (isLoginMode) {
-                signupFields.classList.add('hidden');
-                title.innerText = "Login";
-                mainBtn.innerText = "Login";
-                mainBtn.onclick = handleLogin;
-                switchText.innerText = "Don't have a shop?";
-                switchBtn.innerText = "Create One";
+                signupFields.classList.add('hidden'); title.innerText = "Login";
+                mainBtn.innerText = "Login"; mainBtn.onclick = handleLogin;
+                document.getElementById('auth-switch-text').innerText = "Don't have a shop?"; switchBtn.innerText = "Create One";
             } else {
-                signupFields.classList.remove('hidden');
-                title.innerText = "Create Shop";
-                mainBtn.innerText = "Sign Up";
-                mainBtn.onclick = handleSignup;
-                switchText.innerText = "Already have a shop?";
-                switchBtn.innerText = "Login";
+                signupFields.classList.remove('hidden'); title.innerText = "Create Shop";
+                mainBtn.innerText = "Sign Up"; mainBtn.onclick = handleSignup;
+                document.getElementById('auth-switch-text').innerText = "Already have a shop?"; switchBtn.innerText = "Login";
             }
         }
 
         async function checkUser() {
             if (!isSupabaseReady) return;
             const { data: { user } } = await supabaseClient.auth.getUser();
-            updateNavUI(user);
-            if (user) {
-                const shopName = user.user_metadata.shop_name || "DEXA Seller";
-                document.getElementById('seller-shop-name').innerText = shopName;
-                if (!document.getElementById('seller-view').classList.contains('hidden')) loadSellerProducts(user.id);
-            }
-        }
-
-        function updateNavUI(user) {
             const container = document.getElementById('auth-buttons-desktop');
             if (user) {
                 container.innerHTML = `<button onclick="switchView('seller')" class="text-sm font-bold text-emerald-600">Dashboard</button><button onclick="handleLogout()" class="text-sm font-bold text-slate-400 hover:text-red-500">Logout</button>`;
-                showSellerNav();
+                document.getElementById('seller-shop-name').innerText = user.user_metadata.shop_name || "DEXA Seller";
+                if (!document.getElementById('seller-view').classList.contains('hidden')) loadSellerProducts(user.id);
             } else {
                 container.innerHTML = `<button onclick="toggleModal()" class="text-sm font-bold text-slate-600">Login</button><button onclick="toggleModal(); toggleAuthMode()" class="bg-[#091426] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">Start Selling</button>`;
-                showBuyerNav();
             }
         }
 
         async function handleSignup() {
-            const fullName = document.getElementById('full-name').value;
-            const phone = document.getElementById('phone').value;
-            const shopName = document.getElementById('shop-name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!fullName || !phone || !shopName || !email || !password) {
-                showToast('Please fill in all fields', 'error'); return;
-            }
-
-            const { data, error } = await supabaseClient.auth.signUp({ 
-                email, password, options: { data: { full_name: fullName, phone: phone, shop_name: shopName } }
-            });
-
+            const fullName = document.getElementById('full-name').value, phone = document.getElementById('phone').value, shopName = document.getElementById('shop-name').value, email = document.getElementById('email').value, password = document.getElementById('password').value;
+            if (!fullName || !phone || !shopName || !email || !password) return showToast('Please fill in all fields', 'error');
+            const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: { full_name: fullName, phone: phone, shop_name: shopName } } });
             if (error) showToast(error.message, 'error');
-            else if (data.session) {
-                showToast('Shop created! Welcome, ' + shopName + ' 🎉', 'success');
-                toggleModal();
-                await checkUser();
-                switchView('seller');
-            } else {
-                showToast('Check your email for a confirmation link!', 'info');
-                toggleModal();
-            }
+            else if (data.session) { showToast('Welcome, ' + shopName + ' 🎉', 'success'); toggleModal(); await checkUser(); switchView('seller'); }
+            else { showToast('Check your email for a confirmation link!', 'info'); toggleModal(); }
         }
 
         async function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            if (!email || !password) { showToast('Please fill in all fields', 'error'); return; }
-
+            const email = document.getElementById('email').value, password = document.getElementById('password').value;
+            if (!email || !password) return showToast('Please fill in all fields', 'error');
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) { showToast(error.message, 'error'); }
-            else {
-                showToast('Welcome back! 👋', 'success');
-                toggleModal();
-                await checkUser();
-                switchView('seller');
-            }
+            if (error) showToast(error.message, 'error');
+            else { showToast('Welcome back! 👋', 'success'); toggleModal(); await checkUser(); switchView('seller'); }
         }
 
         async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            showToast('Logged out successfully', 'info');
-            setTimeout(() => window.location.reload(true), 800);
+            await supabaseClient.auth.signOut(); showToast('Logged out successfully', 'info'); setTimeout(() => window.location.reload(true), 800);
+        }
+
+        let selectedImages = [];
+        function previewImages(input) { selectedImages = Array.from(input.files).slice(0, 5); renderPreviews(); }
+        function removePreviewImage(index) { selectedImages.splice(index, 1); renderPreviews(); }
+        function renderPreviews() {
+            const grid = document.getElementById('img-preview-grid'); grid.innerHTML = '';
+            selectedImages.forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const div = document.createElement('div'); div.className = 'img-preview-item';
+                    div.innerHTML = `<img src="${e.target.result}"><button class="img-preview-remove" onclick="removePreviewImage(${i})">✕</button>`;
+                    grid.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         async function handleUpload(e) {
             e.preventDefault();
-            const btn = document.getElementById('upload-btn');
-            const fileInput = document.getElementById('file-uploader');
+            const btn = document.getElementById('upload-btn'); const fileInput = document.getElementById('file-uploader');
             if (!isSupabaseReady) return showToast('System offline', 'error');
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) return showToast('Please login to upload', 'error');
             if (!fileInput.files[0]) return showToast('Please select a product file', 'error');
 
             try {
-                btn.innerHTML = '<div class="dexa-spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;margin-right:8px;"></div> Uploading...';
-                btn.disabled = true;
+                btn.innerHTML = '<div class="dexa-spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;margin-right:8px;"></div> Uploading...'; btn.disabled = true;
+                const shopName = user.user_metadata.shop_name || 'DEXA Seller', title = document.getElementById('prod-title').value.trim(), price = parseFloat(document.getElementById('prod-price').value), desc = document.getElementById('prod-desc').value || 'No description', category = document.getElementById('prod-category').value || 'other';
 
-                const shopName = user.user_metadata.shop_name || 'DEXA Seller';
-                const title    = document.getElementById('prod-title').value.trim();
-                const price    = parseFloat(document.getElementById('prod-price').value);
-                const desc     = document.getElementById('prod-desc').value || 'No description';
-                const category = document.getElementById('prod-category').value || 'other';
-
-                // 1. Upload product file (private)
                 const prodFile = fileInput.files[0];
-                const prodPath = `${user.id}/${Date.now()}_${prodFile.name.replace(/[^a-z0-9.]/gi,'_')}`;
+                const prodPath = `${user.id}/${Date.now()}_${prodFile.name.replace(/[^a-z0-9.]/gi, '_')}`;
                 const { error: fileErr } = await supabaseClient.storage.from('products').upload(prodPath, prodFile);
                 if (fileErr) throw fileErr;
 
-                // 2. Upload images — up to 5
-                let firstCoverUrl = null;
-                const imageUrls = [];
+                let firstCoverUrl = null; const imageUrls = [];
                 for (let i = 0; i < selectedImages.length; i++) {
-                    const img = selectedImages[i];
-                    const imgPath = `${user.id}/${Date.now()}_${i}_${img.name.replace(/[^a-z0-9.]/gi,'_')}`;
-                    const { error: imgErr } = await supabaseClient.storage.from('covers').upload(imgPath, img);
+                    const imgPath = `${user.id}/${Date.now()}_${i}_${selectedImages[i].name.replace(/[^a-z0-9.]/gi, '_')}`;
+                    const { error: imgErr } = await supabaseClient.storage.from('covers').upload(imgPath, selectedImages[i]);
                     if (imgErr) throw imgErr;
                     const { data: urlData } = supabaseClient.storage.from('covers').getPublicUrl(imgPath);
-                    imageUrls.push(urlData.publicUrl);
-                    if (i === 0) firstCoverUrl = urlData.publicUrl;
+                    imageUrls.push(urlData.publicUrl); if (i === 0) firstCoverUrl = urlData.publicUrl;
                 }
 
-                // 3. Insert product record
-                const { data: productData, error: dbErr } = await supabaseClient.from('products').insert({
-                    title, price, description: desc,
-                    file_url: prodPath,
-                    cover_image: firstCoverUrl,
-                    category,
-                    seller_id: user.id,
-                    seller_email: shopName
-                }).select().single();
+                const { data: productData, error: dbErr } = await supabaseClient.from('products').insert({ title, price, description: desc, file_url: prodPath, cover_image: firstCoverUrl, category, seller_id: user.id, seller_email: shopName }).select().single();
                 if (dbErr) throw dbErr;
 
-                // 4. Save images to product_images table
                 if (imageUrls.length > 0 && productData) {
-                    await supabaseClient.from('product_images').insert(
-                        imageUrls.map(url => ({ product_id: productData.id, image_url: url }))
-                    );
+                    await supabaseClient.from('product_images').insert(imageUrls.map(url => ({ product_id: productData.id, image_url: url })));
                 }
 
-                showToast('Product published! 🚀', 'success');
-                document.getElementById('upload-form').reset();
-                selectedImages = [];
-                document.getElementById('img-preview-grid').innerHTML = '';
-                loadSellerProducts(user.id);
-                loadPublicMarket();
-
-            } catch(err) {
-                console.error(err);
-                showToast(err.message || 'Upload failed. Try again.', 'error');
-            } finally {
-                btn.innerHTML = '<i data-lucide="upload" style="width:16px;height:16px;"></i> Publish Product';
-                btn.disabled = false;
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            }
-        }
-
-        function buyProduct(title, price, fileUrl) {
-            // Legacy — now handled by openProductModal
+                showToast('Product published! 🚀', 'success'); document.getElementById('upload-form').reset();
+                selectedImages = []; document.getElementById('img-preview-grid').innerHTML = '';
+                loadSellerProducts(user.id); loadPublicMarket();
+            } catch (err) { showToast(err.message || 'Upload failed.', 'error'); }
+            finally { btn.innerHTML = '<i data-lucide="upload" style="width:16px;height:16px;"></i> Publish Product'; btn.disabled = false; if (typeof lucide !== 'undefined') lucide.createIcons(); }
         }
 
         async function loadSellerProducts(uid) {
             const { data } = await supabaseClient.from('products').select('*').eq('seller_id', uid).order('created_at', { ascending: false });
-            const list = document.getElementById('seller-list');
-            list.innerHTML = '';
-            if (!data || data.length === 0) {
-                list.innerHTML = '<p class="text-slate-400 text-sm">No products yet. Upload your first product above!</p>';
-                return;
-            }
+            const list = document.getElementById('seller-list'); list.innerHTML = '';
+            if (!data || data.length === 0) return list.innerHTML = '<p class="text-slate-400 text-sm">No products yet.</p>';
             data.forEach(d => {
-                const coverThumb = d.cover_image
-                    ? `<img src="${d.cover_image}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;flex-shrink:0;">`
-                    : `<div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#091426,#1a3a5c);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
-                list.innerHTML += `
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm" id="listing-${d.id}">
-                    <div class="flex items-center gap-3 mb-3">
-                        ${coverThumb}
-                        <div class="flex-1 min-w-0">
-                            <p class="font-bold text-sm text-[#091426] truncate">${d.title}</p>
-                            <p class="text-xs text-slate-400">${d.category || 'other'} · ${d.hidden ? '<span style="color:#f59e0b;font-weight:700;">Hidden</span>' : '<span style="color:#10b981;font-weight:700;">Live</span>'}</p>
-                        </div>
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-black flex-shrink-0">R${parseFloat(d.price).toFixed(2)}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editProductPrice('${d.id}', ${d.price})"
-                            class="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-[#177DFE] text-slate-500 text-xs font-bold transition-colors border border-slate-100">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            Edit Price
-                        </button>
-                        <button onclick="toggleProductVisibility('${d.id}', ${!!d.hidden})"
-                            class="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-amber-50 hover:text-amber-600 text-slate-500 text-xs font-bold transition-colors border border-slate-100">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            ${d.hidden ? 'Unhide' : 'Hide'}
-                        </button>
-                        <button onclick="deleteProduct('${d.id}')"
-                            class="flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-red-50 hover:text-red-500 text-slate-500 text-xs font-bold transition-colors border border-slate-100">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-                            Delete
-                        </button>
-                    </div>
-                </div>`;
+                const coverThumb = d.cover_image ? `<img src="${d.cover_image}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;flex-shrink:0;">` : `<div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#091426,#1a3a5c);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
+                list.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm" id="listing-${d.id}"><div class="flex items-center gap-3 mb-3">${coverThumb}<div class="flex-1 min-w-0"><p class="font-bold text-sm text-[#091426] truncate">${d.title}</p><p class="text-xs text-slate-400">${d.category || 'other'} · ${d.hidden ? '<span style="color:#f59e0b;font-weight:700;">Hidden</span>' : '<span style="color:#10b981;font-weight:700;">Live</span>'}</p></div><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-black flex-shrink-0">R${parseFloat(d.price).toFixed(2)}</span></div><div class="flex gap-2"><button onclick="editProductPrice('${d.id}', ${d.price})" class="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-500 text-xs font-bold border border-slate-100">Edit Price</button><button onclick="toggleProductVisibility('${d.id}', ${!!d.hidden})" class="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-500 text-xs font-bold border border-slate-100">${d.hidden ? 'Unhide' : 'Hide'}</button><button onclick="deleteProduct('${d.id}')" class="flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-red-50 text-slate-500 text-xs font-bold border border-slate-100">Delete</button></div></div>`;
             });
         }
 
         async function editProductPrice(productId, currentPrice) {
             const newPriceStr = prompt('Current price: R' + parseFloat(currentPrice).toFixed(2) + '\nEnter new price (ZAR):');
-            if (!newPriceStr) return;
-            const newPrice = parseFloat(newPriceStr);
-            if (isNaN(newPrice) || newPrice <= 0) { showToast('Please enter a valid price', 'error'); return; }
+            if (!newPriceStr) return; const newPrice = parseFloat(newPriceStr);
+            if (isNaN(newPrice) || newPrice <= 0) return showToast('Please enter a valid price', 'error');
             const { error } = await supabaseClient.from('products').update({ price: newPrice }).eq('id', productId);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Price updated to R' + newPrice.toFixed(2) + ' ✓', 'success');
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) loadSellerProducts(user.id);
+            if (error) return showToast(error.message, 'error');
+            showToast('Price updated ✓', 'success'); const { data: { user } } = await supabaseClient.auth.getUser(); if (user) loadSellerProducts(user.id);
         }
 
         async function toggleProductVisibility(productId, isHidden) {
             const { error } = await supabaseClient.from('products').update({ hidden: !isHidden }).eq('id', productId);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast(isHidden ? 'Product is now visible ✓' : 'Product hidden from marketplace', 'info');
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) loadSellerProducts(user.id);
-            loadPublicMarket();
+            if (error) return showToast(error.message, 'error');
+            showToast(isHidden ? 'Product visible ✓' : 'Product hidden', 'info');
+            const { data: { user } } = await supabaseClient.auth.getUser(); if (user) loadSellerProducts(user.id); loadPublicMarket();
         }
 
         async function deleteProduct(productId) {
-            if (!confirm('Delete this product? This cannot be undone.')) return;
+            if (!confirm('Delete this product? Cannot be undone.')) return;
             const { error } = await supabaseClient.from('products').delete().eq('id', productId);
-            if (error) { showToast(error.message, 'error'); return; }
-            showToast('Product deleted', 'info');
-            document.getElementById('listing-' + productId)?.remove();
-            loadPublicMarket();
+            if (error) return showToast(error.message, 'error');
+            showToast('Product deleted', 'info'); document.getElementById('listing-' + productId)?.remove(); loadPublicMarket();
         }
 
         async function loadPublicMarket() {
             if (!isSupabaseReady) return;
-            // Clear any browser-autofilled search value
-            const searchEl = document.getElementById('search-input');
-            if (searchEl && searchEl.value && !searchEl.dataset.userTyped) searchEl.value = '';
-            const grid = document.getElementById('public-product-grid');
-            grid.innerHTML = '<div class="loading-state col-span-full"><div class="dexa-spinner"></div><p>Loading marketplace...</p></div>';
+            const searchEl = document.getElementById('search-input'); if (searchEl && searchEl.value && !searchEl.dataset.userTyped) searchEl.value = '';
+            document.getElementById('public-product-grid').innerHTML = '<div class="loading-state col-span-full"><div class="dexa-spinner"></div><p>Loading marketplace...</p></div>';
             const { data, error } = await supabaseClient.from('products').select('*').or('hidden.eq.false,hidden.is.null').limit(50);
-            if (error) {
-                grid.innerHTML = '<p class="text-slate-400 text-sm col-span-full text-center py-16">Could not load products. Please refresh.</p>';
-                return;
-            }
-            allProducts = data || [];
-            filterProducts();
+            if (error) return document.getElementById('public-product-grid').innerHTML = '<p class="col-span-full text-center py-16">Could not load products.</p>';
+            allProducts = data || []; filterProducts();
         }
 
-
-
-
-        // ── LIVE BILLBOARD ──────────────────────────────────────────────
-        let billboardSellers = [];
-        let billboardIndex = 0;
-        let billboardInterval = null;
-
+        // LIVE BILLBOARD
+        let billboardSellers = [], billboardIndex = 0, billboardInterval = null;
         async function loadBillboard() {
             if (!isSupabaseReady) return;
-
-            // Get all unique sellers who have visible products
-            const { data: products } = await supabaseClient
-                .from('products')
-                .select('*')
-                .or('hidden.eq.false,hidden.is.null')
-                .order('created_at', { ascending: false });
-
+            const { data: products } = await supabaseClient.from('products').select('*').or('hidden.eq.false,hidden.is.null').order('created_at', { ascending: false });
             if (!products || products.length === 0) return;
-
-            // Group products by seller
             const sellerMap = {};
-            products.forEach(p => {
-                if (!sellerMap[p.seller_id]) {
-                    sellerMap[p.seller_id] = {
-                        shop: p.seller_email || 'DEXA Seller',
-                        products: []
-                    };
-                }
-                sellerMap[p.seller_id].products.push(p);
-            });
-
+            products.forEach(p => { if (!sellerMap[p.seller_id]) sellerMap[p.seller_id] = { shop: p.seller_email || 'DEXA Seller', products: [] }; sellerMap[p.seller_id].products.push(p); });
             billboardSellers = Object.values(sellerMap);
-
-            // Determine which slot we're in based on 2-hour windows
-            // Each seller gets a 2-hour window in rotation
-            const hoursElapsed = Math.floor(Date.now() / (1000 * 60 * 60 * 2));
-            billboardIndex = hoursElapsed % billboardSellers.length;
-
-            renderBillboard();
-            buildBillboardDots();
-            startBillboardTimer();
+            billboardIndex = Math.floor(Date.now() / (1000 * 60 * 60 * 2)) % billboardSellers.length;
+            renderBillboard(); buildBillboardDots(); startBillboardTimer();
         }
 
         function renderBillboard() {
             if (!billboardSellers.length) return;
-            const seller = billboardSellers[billboardIndex];
-            // Pick the featured product — first with cover image, else first product
-            const featured = seller.products.find(p => p.cover_image) || seller.products[0];
-
-            // Shop name & avatar
-            const shopName = seller.shop;
+            const seller = billboardSellers[billboardIndex], featured = seller.products.find(p => p.cover_image) || seller.products[0], shopName = seller.shop;
             document.getElementById('bb-shop').textContent = shopName;
-            document.getElementById('bb-tagline').textContent =
-                seller.products.length === 1
-                    ? '1 product on DEXA'
-                    : seller.products.length + ' products on DEXA';
+            document.getElementById('bb-tagline').textContent = seller.products.length + ' products on DEXA';
             document.getElementById('bb-avatar').textContent = shopName.charAt(0).toUpperCase();
-
-            // Featured product
             document.getElementById('bb-product').textContent = featured.title;
             document.getElementById('bb-price').textContent = 'R' + parseFloat(featured.price).toFixed(2);
-
-            // Thumbnail
-            const thumb = document.getElementById('bb-thumb');
-            if (featured.cover_image) {
-                thumb.innerHTML = `<img src="${featured.cover_image}" style="width:100%;height:100%;object-fit:cover;">`;
-            } else {
-                thumb.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
-            }
-
-            // Explore button — opens product page directly
+            document.getElementById('bb-thumb').innerHTML = featured.cover_image ? `<img src="${featured.cover_image}" style="width:100%;height:100%;object-fit:cover;">` : `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
             document.getElementById('bb-explore-btn').onclick = () => openProductPage(featured);
-
-            // Update active dot
-            document.querySelectorAll('.bb-dot').forEach((d, i) => {
-                d.classList.toggle('active', i === billboardIndex);
-            });
+            document.querySelectorAll('.bb-dot').forEach((d, i) => d.classList.toggle('active', i === billboardIndex));
         }
 
         function buildBillboardDots() {
-            const dotsEl = document.getElementById('bb-dots');
-            dotsEl.innerHTML = '';
+            const dotsEl = document.getElementById('bb-dots'); dotsEl.innerHTML = '';
             if (billboardSellers.length <= 1) return;
             billboardSellers.forEach((_, i) => {
-                const dot = document.createElement('div');
-                dot.className = 'bb-dot' + (i === billboardIndex ? ' active' : '');
-                dot.onclick = () => { billboardIndex = i; renderBillboard(); };
-                dotsEl.appendChild(dot);
+                const dot = document.createElement('div'); dot.className = 'bb-dot' + (i === billboardIndex ? ' active' : '');
+                dot.onclick = () => { billboardIndex = i; renderBillboard(); }; dotsEl.appendChild(dot);
             });
         }
 
         function startBillboardTimer() {
-            // Calculate ms until next 2-hour boundary
-            const now = Date.now();
-            const twoHours = 1000 * 60 * 60 * 2;
-            const msUntilNext = twoHours - (now % twoHours);
-
+            const now = Date.now(), msUntilNext = (1000 * 60 * 60 * 2) - (now % (1000 * 60 * 60 * 2));
             function updateTimerDisplay() {
                 const remaining = msUntilNext - (Date.now() - now);
-                if (remaining <= 0) {
-                    billboardIndex = (billboardIndex + 1) % billboardSellers.length;
-                    renderBillboard();
-                    startBillboardTimer(); // restart for next window
-                    return;
-                }
-                const h = Math.floor(remaining / 3600000);
-                const m = Math.floor((remaining % 3600000) / 60000);
-                const s = Math.floor((remaining % 60000) / 1000);
-                const timerText = 'Next in ' + (h > 0 ? h + 'h ' : '') + m + 'm ' + s + 's';
-                document.getElementById('bb-timer').textContent = timerText;
-                const mob = document.getElementById('bb-timer-mobile');
-                if (mob) mob.textContent = timerText;
+                if (remaining <= 0) { billboardIndex = (billboardIndex + 1) % billboardSellers.length; renderBillboard(); return startBillboardTimer(); }
+                const h = Math.floor(remaining / 3600000), m = Math.floor((remaining % 3600000) / 60000), s = Math.floor((remaining % 60000) / 1000);
+                const text = 'Next in ' + (h > 0 ? h + 'h ' : '') + m + 'm ' + s + 's';
+                document.getElementById('bb-timer').textContent = text; if (document.getElementById('bb-timer-mobile')) document.getElementById('bb-timer-mobile').textContent = text;
             }
-
-            updateTimerDisplay();
-            if (billboardInterval) clearInterval(billboardInterval);
-            billboardInterval = setInterval(updateTimerDisplay, 1000);
+            updateTimerDisplay(); if (billboardInterval) clearInterval(billboardInterval); billboardInterval = setInterval(updateTimerDisplay, 1000);
         }
 
-        // ── PRODUCT PAGE ──────────────────────────────────────────────
+        // PRODUCT PAGE
         let currentPageProduct = null;
-        let selectedImages = [];
-
-   function openProductPage(product, skipHistory = false) {
+        function openProductPage(product, skipHistory = false) {
             currentPageProduct = product;
             document.getElementById('pp-breadcrumb').textContent = product.title;
             document.getElementById('pp-title').textContent = product.title;
@@ -1292,52 +1361,29 @@
             document.getElementById('pp-price-btn').textContent = priceStr;
             document.getElementById('pp-email').value = '';
             document.getElementById('pp-buy-btn').onclick = executePageBuy;
-            
-            // Safe URL updating that won't crash your local file testing!
-            if (!skipHistory) {
-                try {
-                    window.history.pushState({ p: product.id }, '', '?p=' + product.id);
-                } catch(err) {
-                    console.warn("Direct links disabled locally. Will work on Netlify!");
-                }
-            }
 
+            if (!skipHistory) {
+                try { window.history.pushState({ p: product.id }, '', '?p=' + product.id); } catch (err) { console.warn("Direct links disabled locally."); }
+            }
             buildGallery(product);
             document.getElementById('product-page').classList.add('open');
             document.body.style.overflow = 'hidden';
         }
 
         async function buildGallery(product) {
-            const gallery = document.getElementById('pp-gallery');
-            const dots = document.getElementById('pp-dots');
-            gallery.innerHTML = '';
-            dots.innerHTML = '';
-            let images = [];
-            
+            const gallery = document.getElementById('pp-gallery'), dots = document.getElementById('pp-dots');
+            gallery.innerHTML = ''; dots.innerHTML = ''; let images = [];
             if (isSupabaseReady && product.id) {
-                const { data } = await supabaseClient
-                    .from('product_images')
-                    .select('image_url')
-                    .eq('product_id', product.id);
+                const { data } = await supabaseClient.from('product_images').select('image_url').eq('product_id', product.id);
                 if (data && data.length > 0) images = data.map(r => r.image_url);
             }
-            
             if (images.length === 0 && product.cover_image) images = [product.cover_image];
-            
-            if (images.length === 0) {
-                gallery.innerHTML = '<div class="gallery-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
-                return;
-            }
-            
+            if (images.length === 0) { gallery.innerHTML = '<div class="gallery-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>'; return; }
+
             images.forEach((url, i) => {
-                const img = document.createElement('img');
-                img.src = url; img.className = 'gallery-img'; img.alt = product.title;
-                gallery.appendChild(img);
-                const dot = document.createElement('div');
-                dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
-                dots.appendChild(dot);
+                const img = document.createElement('img'); img.src = url; img.className = 'gallery-img'; img.alt = product.title; gallery.appendChild(img);
+                const dot = document.createElement('div'); dot.className = 'gallery-dot' + (i === 0 ? ' active' : ''); dots.appendChild(dot);
             });
-            
             if (images.length > 1) {
                 gallery.addEventListener('scroll', () => {
                     const idx = Math.round(gallery.scrollLeft / gallery.offsetWidth);
@@ -1348,257 +1394,117 @@
 
         function closeProductPage() {
             document.getElementById('product-page').classList.remove('open');
-            document.body.style.overflow = '';
-            currentPageProduct = null;
-
-            // Safely clear the URL
+            document.body.style.overflow = ''; currentPageProduct = null;
             if (window.location.search.includes('p=')) {
-                try {
-                    window.history.pushState({}, '', window.location.pathname);
-                } catch(err) {}
+                try { window.history.pushState({}, '', window.location.pathname); } catch (err) { }
             }
         }
 
         async function shareProduct() {
             if (!currentPageProduct) return;
-            
-            const shareData = {
-                title: currentPageProduct.title,
-                text: `Check out ${currentPageProduct.title} on DEXA!`,
-                url: window.location.href // This grabs the exact ?p=123 link!
-            };
-
+            const shareData = { title: currentPageProduct.title, text: `Check out ${currentPageProduct.title} on DEXA!`, url: window.location.href };
             try {
-                // Try the native mobile share menu first
-                if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
-                    await navigator.share(shareData);
-                } else {
-                    // Fallback for Desktop/Laptops: Just copy the link
-                    await navigator.clipboard.writeText(shareData.url);
-                    showToast('Product link copied to clipboard! 📋', 'success');
-                }
+                if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) await navigator.share(shareData);
+                else { await navigator.clipboard.writeText(shareData.url); showToast('Product link copied! 📋', 'success'); }
             } catch (err) {
-                // If they cancel the mobile share menu, do nothing. 
-                // But if it actually fails, fallback to copying the link.
                 if (err.name !== 'AbortError') {
-                    try {
-                        await navigator.clipboard.writeText(shareData.url);
-                        showToast('Product link copied to clipboard! 📋', 'success');
-                    } catch(e) {
-                        showToast('Failed to copy link.', 'error');
-                    }
+                    try { await navigator.clipboard.writeText(shareData.url); showToast('Product link copied! 📋', 'success'); }
+                    catch (e) { showToast('Failed to copy link.', 'error'); }
                 }
             }
         }
 
         async function executePageBuy() {
             const email = document.getElementById('pp-email').value.trim();
-            if (!email || !email.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
+            if (!email || !email.includes('@')) return showToast('Please enter a valid email', 'error');
             if (!currentPageProduct) return;
-            if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes('YOUR')) { showToast('Payment system offline.', 'error'); return; }
-            const product = currentPageProduct;
+            if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes('YOUR')) return showToast('Payment system offline.', 'error');
+
             let handler = PaystackPop.setup({
-                key: PAYSTACK_PUBLIC_KEY,
-                email: email,
-                amount: Math.round(parseFloat(product.price) * 100),
-                currency: 'ZAR',
+                key: PAYSTACK_PUBLIC_KEY, email: email, amount: Math.round(parseFloat(currentPageProduct.price) * 100), currency: 'ZAR',
                 ref: '' + Math.floor((Math.random() * 1000000000) + 1),
-                metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: product.title }] },
-                callback: async function(response) {
+                metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: currentPageProduct.title }] },
+                callback: async function (response) {
                     showToast('Payment successful! Generating secure download...', 'success', 6000);
-                    const { data, error } = await supabaseClient.storage.from('products').createSignedUrl(product.file_url, 300);
-                    if (error || !data) { showToast('Error generating link. Contact support.', 'error'); }
-                    else { window.open(data.signedUrl, '_blank'); }
+                    const { data, error } = await supabaseClient.storage.from('products').createSignedUrl(currentPageProduct.file_url, 300);
+                    if (error || !data) showToast('Error generating link. Contact support.', 'error');
+                    else window.open(data.signedUrl, '_blank');
                 },
-                onClose: function() { showToast('Transaction cancelled.', 'info'); }
+                onClose: function () { showToast('Transaction cancelled.', 'info'); }
             });
             handler.openIframe();
         }
 
-        async function executePageBuy() {
-            const email = document.getElementById('pp-email').value.trim();
-            if (!email || !email.includes('@')) { showToast('Please enter a valid email address', 'error'); return; }
-            if (!currentPageProduct) return;
-            if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes('YOUR')) { showToast('Payment system offline.', 'error'); return; }
-            const product = currentPageProduct;
-            let handler = PaystackPop.setup({
-                key: PAYSTACK_PUBLIC_KEY,
-                email: email,
-                amount: Math.round(parseFloat(product.price) * 100),
-                currency: 'ZAR',
-                ref: '' + Math.floor((Math.random() * 1000000000) + 1),
-                metadata: { custom_fields: [{ display_name: "Product", variable_name: "product", value: product.title }] },
-                callback: async function(response) {
-                    showToast('Payment successful! Generating secure download...', 'success', 6000);
-                    const { data, error } = await supabaseClient.storage.from('products').createSignedUrl(product.file_url, 300);
-                    if (error || !data) { showToast('Error generating link. Contact support.', 'error'); }
-                    else { window.open(data.signedUrl, '_blank'); }
-                },
-                onClose: function() { showToast('Transaction cancelled.', 'info'); }
-            });
-            handler.openIframe();
-        }
-
-        function previewImages(input) {
-            selectedImages = Array.from(input.files).slice(0, 5);
-            renderPreviews();
-        }
-
-        function removePreviewImage(index) {
-            selectedImages.splice(index, 1);
-            renderPreviews();
-        }
-
-        function renderPreviews() {
-            const grid = document.getElementById('img-preview-grid');
-            grid.innerHTML = '';
-            selectedImages.forEach((file, i) => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const div = document.createElement('div');
-                    div.className = 'img-preview-item';
-                    div.innerHTML = `<img src="${e.target.result}" alt="preview"><button class="img-preview-remove" onclick="removePreviewImage(${i})">✕</button>`;
-                    grid.appendChild(div);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // NEW: Handle the browser's physical Back/Forward buttons smoothly
         window.addEventListener('popstate', () => {
             const productId = new URLSearchParams(window.location.search).get('p');
-            if (productId) {
-                // They clicked back/forward to a specific product link
-                checkUrlForProduct();
-            } else {
-                // They clicked back to the main marketplace grid
-                document.getElementById('product-page').classList.remove('open');
-                document.body.style.overflow = '';
-                currentPageProduct = null;
-            }
+            if (productId) checkUrlForProduct();
+            else { document.getElementById('product-page').classList.remove('open'); document.body.style.overflow = ''; currentPageProduct = null; }
         });
 
-        // ── MOBILE NAV LOGIC ──────────────────────────────────────────
-        function setActiveTab(id) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            const el = document.getElementById(id);
-            if (el) el.classList.add('active');
-        }
-
-        function showBuyerNav() {
-            document.getElementById('buyer-nav-tabs').classList.remove('hidden');
-            document.getElementById('seller-nav-tabs').classList.add('hidden');
-        }
-
-        function showSellerNav() {
-            document.getElementById('buyer-nav-tabs').classList.add('hidden');
-            document.getElementById('seller-nav-tabs').classList.remove('hidden');
-        }
-
+        function setActiveTab(id) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); const el = document.getElementById(id); if (el) el.classList.add('active'); }
         function navTo(tab) {
-            // Clear all active
             document.querySelectorAll('#buyer-nav-tabs .nav-tab').forEach(t => t.classList.remove('active'));
-            if (tab === 'home') {
-                document.getElementById('tab-home').classList.add('active');
-                switchView('buyer');
-            } else if (tab === 'search') {
-                document.getElementById('tab-search').classList.add('active');
-                switchView('buyer');
-                setTimeout(() => document.getElementById('search-input').focus(), 300);
-            } else if (tab === 'purchases') {
-                document.getElementById('tab-purchases').classList.add('active');
-                // Future: show purchases view — for now show buyer marketplace
-                switchView('buyer');
-                showToast('Purchases coming soon!', 'info');
-            } else if (tab === 'profile') {
+            if (tab === 'home') { document.getElementById('tab-home').classList.add('active'); switchView('buyer'); }
+            else if (tab === 'search') { document.getElementById('tab-search').classList.add('active'); switchView('buyer'); setTimeout(() => document.getElementById('search-input').focus(), 300); }
+            else if (tab === 'purchases') { document.getElementById('tab-purchases').classList.add('active'); switchView('buyer'); showToast('Purchases coming soon!', 'info'); }
+            else if (tab === 'profile') {
                 document.getElementById('tab-profile').classList.add('active');
-                if (isSupabaseReady) {
-                    supabaseClient.auth.getUser().then(({ data: { user } }) => {
-                        if (user) { switchView('seller'); }
-                        else { toggleModal(); }
-                    });
-                } else { toggleModal(); }
+                if (isSupabaseReady) supabaseClient.auth.getUser().then(({ data: { user } }) => { if (user) switchView('seller'); else toggleModal(); });
+                else toggleModal();
             }
         }
-
-        // switchView is already nav-aware — no override needed
-
-        // Init handled by initSupabase() above — no duplicate onload needed
     </script>
 
-    <!-- ── DEXA SIGNATURE MUSIC PLAYER ── -->
+    <!-- DEXA MUSIC PLAYER -->
     <div id="dexa-player" onclick="toggleMusic()" title="Tap to mute/unmute">
         <div class="dexa-disc" id="dexa-disc">
-            <div class="mute-x">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                    <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
-                    <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
-                    <line x1="12" y1="19" x2="12" y2="23"></line>
-                    <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round"
+                style="width: 14px; height: 14px; color: rgba(255,255,255,0.5); position: absolute; z-index: 10;">
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+                <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
         </div>
     </div>
-
-    <!-- Audio element — point src to your MP3 -->
     <audio id="dexa-audio" loop preload="auto">
         <source src="assets/dexa_vibes.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        const audio  = document.getElementById('dexa-audio');
+        const audio = document.getElementById('dexa-audio');
         const player = document.getElementById('dexa-player');
-
         audio.volume = 0.18;
         let userMuted = localStorage.getItem('dexa_muted') === 'true';
 
         function setPlayerState(playing) {
             if (playing) {
                 player.classList.remove('muted');
+                document.querySelector('.dexa-disc svg').style.display = 'none';
             } else {
                 player.classList.add('muted');
+                document.querySelector('.dexa-disc svg').style.display = 'block';
             }
         }
 
         function toggleMusic() {
-            userMuted = !userMuted;
-            localStorage.setItem('dexa_muted', userMuted);
-            if (userMuted) {
-                audio.pause();
-                setPlayerState(false);
-            } else {
-                audio.play().catch(() => {});
-                setPlayerState(true);
-            }
+            userMuted = !userMuted; localStorage.setItem('dexa_muted', userMuted);
+            if (userMuted) { audio.pause(); setPlayerState(false); }
+            else { audio.play().catch(() => { }); setPlayerState(true); }
         }
 
-        // Autoplay on load — browsers require a user gesture first,
-        // so we attempt autoplay and fall back gracefully if blocked
         function tryAutoplay() {
-            if (userMuted) {
-                setPlayerState(false);
-                return;
-            }
-            audio.play().then(() => {
-                setPlayerState(true);
-            }).catch(() => {
-                // Browser blocked autoplay — wait for first interaction then play
-                setPlayerState(false);
-                player.title = 'Tap to play';
-                const playOnInteract = () => {
-                    if (!userMuted) {
-                        audio.play().then(() => setPlayerState(true)).catch(() => {});
-                    }
-                    document.removeEventListener('click', playOnInteract);
-                };
+            if (userMuted) return setPlayerState(false);
+            audio.play().then(() => setPlayerState(true)).catch(() => {
+                setPlayerState(false); player.title = 'Tap to play';
+                const playOnInteract = () => { if (!userMuted) audio.play().then(() => setPlayerState(true)).catch(() => { }); document.removeEventListener('click', playOnInteract); };
                 document.addEventListener('click', playOnInteract);
             });
         }
-
-        // Slight delay so page loads first
         setTimeout(tryAutoplay, 1200);
     </script>
-
 </body>
+
 </html>
