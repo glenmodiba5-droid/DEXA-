@@ -1285,7 +1285,7 @@
             document.getElementById('pp-email').value = '';
             document.getElementById('pp-buy-btn').onclick = executePageBuy;
             
-            // FIX: Safe URL updating that won't crash your local file testing!
+            // Safe URL updating that won't crash your local file testing!
             if (!skipHistory) {
                 try {
                     window.history.pushState({ p: product.id }, '', '?p=' + product.id);
@@ -1299,12 +1299,51 @@
             document.body.style.overflow = 'hidden';
         }
 
+        async function buildGallery(product) {
+            const gallery = document.getElementById('pp-gallery');
+            const dots = document.getElementById('pp-dots');
+            gallery.innerHTML = '';
+            dots.innerHTML = '';
+            let images = [];
+            
+            if (isSupabaseReady && product.id) {
+                const { data } = await supabaseClient
+                    .from('product_images')
+                    .select('image_url')
+                    .eq('product_id', product.id);
+                if (data && data.length > 0) images = data.map(r => r.image_url);
+            }
+            
+            if (images.length === 0 && product.cover_image) images = [product.cover_image];
+            
+            if (images.length === 0) {
+                gallery.innerHTML = '<div class="gallery-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
+                return;
+            }
+            
+            images.forEach((url, i) => {
+                const img = document.createElement('img');
+                img.src = url; img.className = 'gallery-img'; img.alt = product.title;
+                gallery.appendChild(img);
+                const dot = document.createElement('div');
+                dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
+                dots.appendChild(dot);
+            });
+            
+            if (images.length > 1) {
+                gallery.addEventListener('scroll', () => {
+                    const idx = Math.round(gallery.scrollLeft / gallery.offsetWidth);
+                    dots.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+                });
+            }
+        }
+
         function closeProductPage() {
             document.getElementById('product-page').classList.remove('open');
             document.body.style.overflow = '';
             currentPageProduct = null;
 
-            // FIX: Safely clear the URL
+            // Safely clear the URL
             if (window.location.search.includes('p=')) {
                 try {
                     window.history.pushState({}, '', window.location.pathname);
