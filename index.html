@@ -1350,8 +1350,16 @@
             document.getElementById('product-page').classList.remove('open');
             document.body.style.overflow = '';
             currentPageProduct = null;
-            
-            async function shareProduct() {
+
+            // Safely clear the URL
+            if (window.location.search.includes('p=')) {
+                try {
+                    window.history.pushState({}, '', window.location.pathname);
+                } catch(err) {}
+            }
+        }
+
+        async function shareProduct() {
             if (!currentPageProduct) return;
             
             const shareData = {
@@ -1389,7 +1397,7 @@
                     window.history.pushState({}, '', window.location.pathname);
                 } catch(err) {}
             }
-        }
+        
 
         async function executePageBuy() {
             const email = document.getElementById('pp-email').value.trim();
