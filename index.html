@@ -171,6 +171,13 @@
             }
         }
 
+        /* PREVENT MOBILE AUTO-ZOOM ON INPUTS */
+        @media screen and (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+        
         /* SEARCH & FILTERS */
         .filter-pill {
             padding: 8px 18px;
