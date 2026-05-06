@@ -786,8 +786,8 @@
                         </div>
                         <h3 class="text-4xl font-black text-[#091426] mb-2">R 0.00</h3>
                         <button
-                            class="w-full bg-[#177DFE] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">
-                            <button class="w-full bg-[#177DFE] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Withdraw Funds</button>
+                            class="w-full bg-[#177DFE] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Withdraw
+                            Funds</button>
                         <p class="text-[10px] text-slate-400 mt-3 text-center leading-relaxed">
                             Payouts are processed manually every Friday directly to your linked bank account.<br>
                             <span class="font-bold">Minimum withdrawal: R200.</span>
@@ -1051,7 +1051,6 @@
                 const displayDesc = d.description && d.description.length > 50 ? d.description.substring(0, 50) + '...' : (d.description || 'Digital Product');
                 const hues = ['135deg, #091426, #1a3a5c', '135deg, #0f172a, #1e3a5f', '135deg, #1a1a2e, #16213e', '135deg, #0d1b2a, #1b4332'];
                 const hue = hues[Math.abs(d.title.charCodeAt(0) || 0) % hues.length];
-                // Note: We avoid JSON.stringify directly in the HTML string to prevent quote breakage
 
                 const card = document.createElement('div');
                 card.className = "product-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden cursor-pointer";
@@ -1266,7 +1265,7 @@
         async function loadSellerProducts(uid) {
             const { data } = await supabaseClient.from('products').select('*').eq('seller_id', uid).order('created_at', { ascending: false });
             const list = document.getElementById('seller-list'); list.innerHTML = '';
-           if (!data || data.length === 0) {
+            if (!data || data.length === 0) {
                 list.innerHTML = `
                 <div class="bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-8 text-center mt-4">
                     <div class="w-12 h-12 bg-blue-100 text-[#177DFE] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1319,13 +1318,67 @@
             showToast('Product deleted', 'info'); document.getElementById('listing-' + productId)?.remove(); loadPublicMarket();
         }
 
+        function filterBySeller(sellerId) {
+            closeProductPage();
+
+            // Clear the search bar
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+
+            // Filter products to get the seller's name
+            const sellerProducts = allProducts.filter(p => p.seller_id === sellerId);
+            const sellerName = sellerProducts.length > 0 ? (sellerProducts[0].seller_email || 'Seller') : 'Seller';
+
+            // Hide the Billboard to make it feel like a private store
+            const billboard = document.getElementById('billboard');
+            if (billboard) billboard.style.display = 'none';
+
+            // Change "Trending Now" header to the Seller's Store name
+            const trendingHeader = document.querySelector('h2.text-2xl.font-black');
+            if (trendingHeader) {
+                trendingHeader.innerHTML = `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <span>@${sellerName}'s Store</span>
+                        <button onclick="loadPublicMarket()" class="text-sm font-bold text-[#177DFE] hover:underline cursor-pointer bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 flex items-center gap-2">← Back to Marketplace</button>
+                    </div>
+                `;
+            }
+
+            // Reset categories visually
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            const allPill = document.querySelector('.filter-pill[data-cat="all"]');
+            if (allPill) allPill.classList.add('active');
+
+            renderProductGrid(sellerProducts);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         async function loadPublicMarket() {
             if (!isSupabaseReady) return;
-            const searchEl = document.getElementById('search-input'); if (searchEl && searchEl.value && !searchEl.dataset.userTyped) searchEl.value = '';
+
+            // Reset Storefront UI back to the default Marketplace view
+            const billboard = document.getElementById('billboard');
+            if (billboard) billboard.style.display = 'block';
+            const trendingHeader = document.querySelector('h2.text-2xl.font-black');
+            if (trendingHeader) trendingHeader.innerHTML = 'Trending Now';
+
+            const searchEl = document.getElementById('search-input');
+            if (searchEl && searchEl.value && !searchEl.dataset.userTyped) searchEl.value = '';
+
             document.getElementById('public-product-grid').innerHTML = '<div class="loading-state col-span-full"><div class="dexa-spinner"></div><p>Loading marketplace...</p></div>';
+
             const { data, error } = await supabaseClient.from('products').select('*').or('hidden.eq.false,hidden.is.null').limit(50);
             if (error) return document.getElementById('public-product-grid').innerHTML = '<p class="col-span-full text-center py-16">Could not load products.</p>';
-            allProducts = data || []; filterProducts();
+
+            allProducts = data || [];
+
+            // Reset Category Filters
+            activeCategory = 'all';
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            const allPill = document.querySelector('.filter-pill[data-cat="all"]');
+            if (allPill) allPill.classList.add('active');
+
+            filterProducts();
         }
 
         // LIVE BILLBOARD
@@ -1429,27 +1482,7 @@
                 try { window.history.pushState({}, '', window.location.pathname); } catch (err) { }
             }
         }
-function filterBySeller(sellerId) {
-            // Close the product page
-            closeProductPage();
-            
-            // Clear the search bar
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) searchInput.value = '';
-            
-            // Reset categories visually
-            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-            const allPill = document.querySelector('.filter-pill[data-cat="all"]');
-            if (allPill) allPill.classList.add('active');
-            
-            // Filter the grid directly
-            const filtered = allProducts.filter(p => p.seller_id === sellerId);
-            renderProductGrid(filtered);
-            showToast('Viewing seller storefront', 'info');
-            
-            // Scroll to top to see the grid
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+
         async function shareProduct() {
             if (!currentPageProduct) return;
             const shareData = { title: currentPageProduct.title, text: `Check out ${currentPageProduct.title} on DEXA!`, url: window.location.href };
@@ -1494,9 +1527,20 @@ function filterBySeller(sellerId) {
         function setActiveTab(id) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); const el = document.getElementById(id); if (el) el.classList.add('active'); }
         function navTo(tab) {
             document.querySelectorAll('#buyer-nav-tabs .nav-tab').forEach(t => t.classList.remove('active'));
-            if (tab === 'home') { document.getElementById('tab-home').classList.add('active'); switchView('buyer'); }
-            else if (tab === 'search') { document.getElementById('tab-search').classList.add('active'); switchView('buyer'); setTimeout(() => document.getElementById('search-input').focus(), 300); }
-            else if (tab === 'purchases') { document.getElementById('tab-purchases').classList.add('active'); switchView('buyer'); showToast('Purchases coming soon!', 'info'); }
+            if (tab === 'home') {
+                document.getElementById('tab-home').classList.add('active');
+                switchView('buyer');
+            }
+            else if (tab === 'search') {
+                document.getElementById('tab-search').classList.add('active');
+                switchView('buyer');
+                setTimeout(() => document.getElementById('search-input').focus(), 300);
+            }
+            else if (tab === 'purchases') {
+                document.getElementById('tab-purchases').classList.add('active');
+                switchView('buyer');
+                showToast('Purchases coming soon!', 'info');
+            }
             else if (tab === 'profile') {
                 document.getElementById('tab-profile').classList.add('active');
                 if (isSupabaseReady) supabaseClient.auth.getUser().then(({ data: { user } }) => { if (user) switchView('seller'); else toggleModal(); });
