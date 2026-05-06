@@ -435,9 +435,6 @@
             background: rgba(255, 255, 255, 0.97);
             backdrop-filter: blur(20px);
             border-top: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
             padding: 8px 0 max(8px, env(safe-area-inset-bottom));
             z-index: 60;
         }
@@ -734,7 +731,8 @@
             </div>
 
             <!-- Marketplace Footer -->
-            <footer style="margin-top:64px;background:#07090f;border-radius:24px;padding:40px 32px 28px;margin-left:-16px;margin-right:-16px;">
+            <footer
+                style="margin-top:64px;background:#07090f;border-radius:24px;padding:40px 32px 28px;margin-left:-16px;margin-right:-16px;">
                 <div class="text-center mb-8">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <img src="assets/dexa_logo_final.png" style="height:28px;filter:invert(1);opacity:0.9;">
@@ -745,28 +743,189 @@
 
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
                     <div>
-                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Company</p>
-                        <p style="font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:4px;">Ratio Capital Holdings (Pty) Ltd</p>
+                        <p
+                            style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">
+                            Company</p>
+                        <p style="font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:4px;">Ratio Capital
+                            Holdings (Pty) Ltd</p>
                         <p style="font-size:11px;color:#4a5568;">Reg. No: 2026/217968/07</p>
                     </div>
                     <div>
-                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Legal</p>
-                        <a href="https://www.dexamarket.co.za/#privacy" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Privacy Policy</a>
-                        <a href="https://www.dexamarket.co.za/terms.html" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Terms & Conditions</a>
+                        <p
+                            style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">
+                            Legal</p>
+                        <a href="https://www.dexamarket.co.za/#privacy" target="_blank"
+                            style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;"
+                            onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Privacy
+                            Policy</a>
+                        <a href="https://www.dexamarket.co.za/terms.html" target="_blank"
+                            style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;"
+                            onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">Terms &
+                            Conditions</a>
                         <p style="font-size:11px;color:#4a5568;">POPIA Compliant</p>
                     </div>
                     <div class="col-span-2 md:col-span-1">
-                        <p style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">Support</p>
-                        <a href="mailto:support@dexamarket.co.za" style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">support@dexamarket.co.za</a>
-                        <a href="https://www.dexamarket.co.za" target="_blank" style="display:block;font-size:12px;font-weight:600;color:#8892a4;text-decoration:none;" onmouseover="this.style.color='#177DFE'" onmouseout="this.style.color='#8892a4'">dexamarket.co.za</a>
+                        <p
+                            style="font-size:10px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;">
+                            Support</p>
+                        <a href="mailto:support@dexamarket.co.za"
+                            style="display:block;font-size:12px;font-weight:600;color:#8892a4;margin-bottom:8px;text-decoration:none;"
+                            onmouseover="this.style.color='#177DFE'"
+                            onmouseout="this.style.color='#8892a4'">support@dexamarket.co.za</a>
+                        <a href="https://www.dexamarket.co.za" target="_blank"
+                            style="display:block;font-size:12px;font-weight:600;color:#8892a4;text-decoration:none;"
+                            onmouseover="this.style.color='#177DFE'"
+                            onmouseout="this.style.color='#8892a4'">dexamarket.co.za</a>
                     </div>
                 </div>
 
                 <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:20px;text-align:center;">
-                    <p style="font-size:11px;color:#2d3748;">© 2026 DEXA · Ratio Capital Holdings (Pty) Ltd · All rights reserved.</p>
-                    <p style="font-size:11px;color:#2d3748;margin-top:4px;">Payments secured by Paystack · Files delivered via Supabase Encrypted Storage</p>
+                    <p style="font-size:11px;color:#2d3748;">© 2026 DEXA · Ratio Capital Holdings (Pty) Ltd · All rights
+                        reserved.</p>
+                    <p style="font-size:11px;color:#2d3748;margin-top:4px;">Payments secured by Paystack · Files
+                        delivered via Supabase Encrypted Storage</p>
                 </div>
             </footer>
+        </div>
+
+        <!-- SELLER VIEW -->
+        <div id="seller-view" class="hidden fade-in p-4 md:p-8 pb-24 md:pb-8">
+            <div class="max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-black text-[#091426]">Seller Hub</h2>
+                    <span id="seller-shop-name"
+                        class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full"></span>
+                </div>
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm h-fit">
+                        <div class="flex items-center gap-3 mb-6 text-slate-400">
+                            <i data-lucide="wallet" class="w-6 h-6"></i>
+                            <span class="text-xs font-bold uppercase tracking-widest">Balance</span>
+                        </div>
+                        <h3 class="text-4xl font-black text-[#091426] mb-2">R 0.00</h3>
+                        <button
+                            class="w-full bg-[#177DFE] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Withdraw
+                            Funds</button>
+                        <p class="text-[10px] text-slate-400 mt-3 text-center leading-relaxed">
+                            Payouts are processed manually every Friday directly to your linked bank account.<br>
+                            <span class="font-bold">Minimum withdrawal: R200.</span>
+                        </p>
+                    </div>
+                    <div class="lg:col-span-2 bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
+                        <h3 class="font-bold text-lg mb-6">Upload Product</h3>
+                        <form id="upload-form" onsubmit="handleUpload(event)" class="space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <input type="text" id="prod-title" placeholder="Product Title" required
+                                    class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
+                                <input type="number" id="prod-price" placeholder="Price (ZAR)" required
+                                    class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE]">
+                            </div>
+                            <select id="prod-category" required
+                                class="w-full bg-slate-50 p-4 rounded-xl font-bold text-sm border-none focus:ring-2 focus:ring-[#177DFE] text-slate-600">
+                                <option value="" disabled selected>Select a Category</option>
+                                <option value="templates">Templates</option>
+                                <option value="saas">SaaS Starter Kits</option>
+                                <option value="ebooks">eBooks</option>
+                                <option value="design">Design Assets</option>
+                                <option value="audio">Audio</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <textarea id="prod-desc" rows="3" placeholder="Describe your product"
+                                class="w-full bg-slate-50 p-4 rounded-xl font-medium text-sm border-none focus:ring-2 focus:ring-[#177DFE]"></textarea>
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Cover Images
+                                    (Up to 5)</p>
+                                <div
+                                    class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center bg-slate-50">
+                                    <input type="file" id="cover-uploader" accept="image/*" multiple
+                                        onchange="previewImages(this)" />
+                                    <div id="img-preview-grid" class="img-preview-grid w-full"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Product File
+                                </p>
+                                <div
+                                    class="p-4 border-2 border-dashed border-slate-200 rounded-xl flex justify-center bg-slate-50">
+                                    <input type="file" id="file-uploader" required />
+                                </div>
+                            </div>
+                            <button id="upload-btn"
+                                class="w-full bg-[#091426] text-white py-4 rounded-xl font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="upload" style="width:16px;height:16px;"></i> Publish Product
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="font-bold text-xl mb-6">Your Listings</h3>
+                    <div id="seller-list" class="space-y-3">
+                        <p class="text-slate-400 text-sm">No products yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOBILE NAV -->
+        <nav id="mobile-nav">
+            <div id="buyer-nav-tabs" class="flex w-full justify-around items-center">
+                <button class="nav-tab active" id="tab-home" onclick="navTo('home')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    <span>Home</span>
+                </button>
+                <button class="nav-tab" id="tab-search" onclick="navTo('search')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <span>Search</span>
+                </button>
+                <button class="nav-tab" id="tab-profile" onclick="navTo('profile')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span>Profile</span>
+                </button>
+            </div>
+
+            <div id="seller-nav-tabs" class="flex w-full justify-around items-center hidden">
+                <button class="nav-tab" id="stab-home" onclick="switchView('buyer'); setActiveTab('stab-home')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    <span>Home</span>
+                </button>
+                <button class="nav-tab active" id="stab-upload"
+                    onclick="switchView('seller'); setActiveTab('stab-upload')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <span>Upload</span>
+                </button>
+                <button class="nav-tab" id="stab-store" onclick="switchView('seller'); setActiveTab('stab-store')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <path d="M9 22V12h6v10" />
+                        <rect x="2" y="7" width="20" height="5" />
+                    </svg>
+                    <span>My Store</span>
+                </button>
+            </div>
+        </nav>
+    </div>
 
     <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
@@ -781,8 +940,6 @@
                 </svg>
             </button>
             <span id="pp-breadcrumb" class="text-sm font-bold text-slate-400 truncate flex-1"></span>
-
-            <!-- SHARE BUTTON -->
             <button class="back-btn" onclick="shareProduct()" title="Share Product">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -1038,7 +1195,10 @@
             const container = document.getElementById('auth-buttons-desktop');
             if (user) {
                 container.innerHTML = `<button onclick="switchView('seller')" class="text-sm font-bold text-emerald-600">Dashboard</button><button onclick="handleLogout()" class="text-sm font-bold text-slate-400 hover:text-red-500">Logout</button>`;
-                document.getElementById('seller-shop-name').innerText = user.user_metadata.shop_name || "DEXA Seller";
+
+                // Safe check to prevent silent crashes
+                document.getElementById('seller-shop-name').innerText = user?.user_metadata?.shop_name || "DEXA Seller";
+
                 if (!document.getElementById('seller-view').classList.contains('hidden')) loadSellerProducts(user.id);
             } else {
                 container.innerHTML = `<button onclick="toggleModal()" class="text-sm font-bold text-slate-600">Login</button><button onclick="toggleModal(); toggleAuthMode()" class="bg-[#091426] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">Start Selling</button>`;
@@ -1125,6 +1285,7 @@
         async function loadSellerProducts(uid) {
             const { data } = await supabaseClient.from('products').select('*').eq('seller_id', uid).order('created_at', { ascending: false });
             const list = document.getElementById('seller-list'); list.innerHTML = '';
+
             if (!data || data.length === 0) {
                 list.innerHTML = `
                 <div class="bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-8 text-center mt-4">
@@ -1149,6 +1310,7 @@
                 if (typeof lucide !== 'undefined') lucide.createIcons();
                 return;
             }
+
             data.forEach(d => {
                 const coverThumb = d.cover_image ? `<img src="${d.cover_image}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;flex-shrink:0;">` : `<div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#091426,#1a3a5c);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
                 list.innerHTML += `<div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm" id="listing-${d.id}"><div class="flex items-center gap-3 mb-3">${coverThumb}<div class="flex-1 min-w-0"><p class="font-bold text-sm text-[#091426] truncate">${d.title}</p><p class="text-xs text-slate-400">${d.category || 'other'} · ${d.hidden ? '<span style="color:#f59e0b;font-weight:700;">Hidden</span>' : '<span style="color:#10b981;font-weight:700;">Live</span>'}</p></div><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-black flex-shrink-0">R${parseFloat(d.price).toFixed(2)}</span></div><div class="flex gap-2"><button onclick="editProductPrice('${d.id}', ${d.price})" class="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-500 text-xs font-bold border border-slate-100">Edit Price</button><button onclick="toggleProductVisibility('${d.id}', ${!!d.hidden})" class="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-500 text-xs font-bold border border-slate-100">${d.hidden ? 'Unhide' : 'Hide'}</button><button onclick="deleteProduct('${d.id}')" class="flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-slate-50 hover:bg-red-50 text-slate-500 text-xs font-bold border border-slate-100">Delete</button></div></div>`;
